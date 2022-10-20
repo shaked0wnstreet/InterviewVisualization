@@ -1,0 +1,16 @@
+    /* const infoJson = data.interviewerDialogs;
+    let xPos = 250;
+    let yPos = 0;
+    const newData = infoJson.map( (aNode) => {
+    for (const aNode of infoJson){ 
+        const newNode = {
+            id: aNode.id,
+            data: {
+                label: (<> {aNode.DialogText}</>)
+            },
+            position: {x: {xPos}, y: {yPos}}
+        }
+        xPos += 20;
+        yPos += 5;
+        setNodes([...nodes, newNode])
+    } */
