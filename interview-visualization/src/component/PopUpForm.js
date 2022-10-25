@@ -2,20 +2,31 @@ import './PopUp.css';
 import { MenuItem, Stack, TextField, Button, Checkbox, FormControlLabel } from '@mui/material';
 import { useState } from 'react';
 import AddIcon from '@mui/icons-material/Add';
+import React from "react";
+import Alternate  from './Alternate';
 
 
-function PopUpForm(props) {
+function PopUpForm(props) { 
 
 // Options for sections
   const sections = [
     {
-      value: 'Education',
+      value: 'Greetings',
+    },
+    {
+      value: 'Previous Work Experience',
     },
     {
       value: 'Technical',
     },
     {
-      value: 'Past Experience',
+      value: 'Education',
+    },
+    {
+      value: 'Personal',
+    },
+    {
+      value: 'Question',
     },
   ];
 
@@ -45,13 +56,10 @@ function PopUpForm(props) {
   // Options for response types
   const responseTypes = [
     {
-      value: 'Education',
+      value: 'Positive/Negative',
     },
     {
-      value: 'Technical',
-    },
-    {
-      value: 'Past Experience',
+      value: 'Statements', 
     },
   ];
 
@@ -60,6 +68,39 @@ function PopUpForm(props) {
   const onResponseTypeChange = (event) => {
     setResponseType(event.target.value);
   };
+
+  //For Required Response checkbox
+  const [requiredResponse, setRequiredResponse] = useState('');
+
+  const onRequiredResponseChange = (event) => {
+      setRequiredResponse(event.target.checked);
+  };
+
+  //For Interruption checkbox
+  const [interruption, setInterruption] = useState('');
+
+  const onInterruptionChange = (event) => {
+      setInterruption(event.target.checked);
+  };
+
+  const interuptees = [
+    {
+      value: 'Interviewee',
+    },
+    {
+      value: 'Interviewer',
+    },
+  ];
+
+  const [interruptionType, setInterruptionType] = useState('');
+
+  const onInterruptionTypeChange = (event) => {
+    setInterruptionType(event.target.value);
+  };
+
+  //For adding an alternate dialog text box
+  const [onAlternate, setOnAlternate] = useState(false);
+
   return (
     <div className='popup'>
       <Stack spacing={2} className='popup-inner'>
@@ -106,47 +147,61 @@ function PopUpForm(props) {
               {option.value}
             </MenuItem>
           ))}
-          </TextField>
-        <TextField
-        id="filled-multiline-static"
-        label="Alternate Dialog"
-        multiline
-        rows={1}
-        fullWidth
-        placeholder="What do you think was challenging about the job?"
-        />
-        <Button variant="outlined" startIcon={<AddIcon/>}>
-          Add Alternate
-        </Button>
-        <TextField
-            id="outlined-required"
-            label="Next Dialog ID"
-            placeholder="001"
-          />
+        </TextField>
 
+        <TextField
+          id="filled-multiline-static"
+          label="Alternate Dialog"
+          multiline
+          rows={1}
+          fullWidth
+          placeholder="What do you think was challenging about the job?"
+        />
+        
+        <Button variant="outlined" onClick={() => setOnAlternate(true)} startIcon={<AddIcon/>}>Add Alternate</Button>
+        {onAlternate ? <Alternate setTrigger={setOnAlternate}/> : ''} 
+
+      <Stack direction='row'spacing={10}>
         <Stack direction='row'spacing={10}>
-          <FormControlLabel labelPlacement='start' control={<Checkbox defaultChecked />} label="Require Respond?" />
+          <FormControlLabel labelPlacement='start' control={<Checkbox checked={requiredResponse} onChange={onRequiredResponseChange} />} label="Require Response?"/>
           <TextField
           id="outlined-number"
           label="Time Limit (seconds)"
           type="number"
+          disabled = {!requiredResponse}         //Disables Time Limit option if unchecked
           InputLabelProps={{
-            shrink: true,
+          shrink: true, 
           }}
-          />
+          />                      
+        </Stack> 
+
+        <Stack direction='row'spacing={10}>
+          <FormControlLabel labelPlacement='start' control={<Checkbox checked={interruption} onChange={onInterruptionChange} />} label="Allow Interruption?"/>
+          <TextField
+            id="outlined-select-currency"
+            select
+            label="Interruption Type"                       //userInterruptionEnabled and Interuptee
+            value={interruptionType}
+            disabled = {!interruption}
+            onChange={onInterruptionTypeChange}
+            helperText="Please select the interruption type"
+            InputLabelProps={{
+              shrink: true, 
+              }}
+          >
+          {interuptees.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.value}
+            </MenuItem>
+          ))}
+          </TextField>                     
         </Stack>
-        <TextField
-          id="filled-multiline-static"
-          label="Entities (required)"
-          require
-          rows={1}
-          fullWidth
-          placeholder="# New Tag"
-        />
+      </Stack>
+
         <TextField
           id="outlined-select-currency"
-          select
-          label="Chose expected response type"
+          select          
+          label="Choose expected response type"
           value={responseType}
           onChange={onResponseTypeChange}
           >
@@ -156,6 +211,45 @@ function PopUpForm(props) {
             </MenuItem>
           ))}
         </TextField>
+
+      <Stack direction='row'spacing={10}>
+        <TextField
+          id="outlined-required"
+          label="Next Dialog ID"
+          required = {responseType === 'Statements'}
+          disabled = {responseType !== 'Statements'}
+          placeholder="001"
+        />
+      
+        <TextField
+          id="outlined-required"
+          label="Next Positive ID"
+          placeholder="PastWork002"
+          required = {responseType === 'Positive/Negative'}
+          disabled = {responseType !== 'Positive/Negative'}
+          helperText="Next ID if positive response (e.g. yes)"
+        />
+
+        <TextField
+          id="outlined-required"
+          label="Next Negative ID"
+          placeholder="002"
+          required = {responseType === 'Positive/Negative'}
+          disabled = {responseType !== 'Positive/Negative'}
+          helperText="Next ID if negative response (e.g. no)"
+         />
+      </Stack>
+
+        <TextField 
+          id="filled-multiline-static" 
+          label="Entities (required)"   //make this to where they can click a button to add more
+          required                      //save into an array of dynamic params that can be selected up top
+          rows={1}
+          fullWidth
+          placeholder="+ New Tag"
+        />
+
+        <Button variant="outlined" startIcon={<AddIcon/>}>Add Entities</Button> 
 
         <br></br>
         <Stack direction='row'spacing={2}>
