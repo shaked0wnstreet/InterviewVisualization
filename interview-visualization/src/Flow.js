@@ -15,34 +15,34 @@ import {
   edges as initialEdges
 } from "./initial-elements";
 
-import json from './GameDev.json';
+// import json from './GameDev.json';
 
-var newNodes = [];
+// var newNodes = [];
 
-for (var i=0; i < json["interviewerDialogs"].length; i++) {
-  var obj = {};
-  var position = {};
-  var data = {};
+// for (var i=0; i < json["interviewerDialogs"].length; i++) {
+//   var obj = {};
+//   var position = {};
+//   var data = {};
 
-  obj.id = String(Number(json["interviewerDialogs"][i]["id"].slice(-3)) + 1);
-  obj.type = "input";
-  obj.label = "Testing";
-  data.label = "Today, I am going to find out if your experience and interests will mesh well with our company, and in the process, you can learn more about our organization and the job.";
-  obj.data = data;
-  position.x =  "200";
-  position.y =  (i+1)*20;
-  obj.position = position;
+//   obj.id = String(Number(json["interviewerDialogs"][i]["id"].slice(-3)) + 1);
+//   obj.type = "input";
+//   obj.label = "Testing";
+//   data.label = "Today, I am going to find out if your experience and interests will mesh well with our company, and in the process, you can learn more about our organization and the job.";
+//   obj.data = data;
+//   position.x =  "200";
+//   position.y =  (i+1)*20;
+//   obj.position = position;
 
-  newNodes.push(obj);
-}
+//   newNodes.push(obj);
+// }
 
-console.log(newNodes);
+// console.log(newNodes);
 
 const onInit = (reactFlowInstance) =>
   console.log("flow loaded:", reactFlowInstance);
 
 const OverviewFlow = () => {
-  const [nodes, setNodes, onNodesChange] = useNodesState(newNodes);
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   // const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const onConnect = useCallback(
