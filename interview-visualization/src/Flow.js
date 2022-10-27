@@ -9,7 +9,7 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { Text } from "@fluentui/react";
-import { Typography, Popover } from "@material-ui/core";
+import { Button, Popover } from "@material-ui/core";
 
 import {
   nodes as initialNodes,
@@ -51,18 +51,34 @@ const OverviewFlow = () => {
     [setEdges]
   );
   
-  const onNodeClick = () => {
-    return (
-      <Text>This is a tool tip for node 1</Text> // doesn't do anything, for a reason that is unknown
-      // console.log("clicked");
-    )
-  }
-  const onNodeMouseEnter = () => {
-    return (
-      <Text>Lorem ipsum dolor sit amet</Text>
-      // console.log("entered")
-    )
-  }
+  // const onNodeClick = () => {
+  //   return (
+  //     <Text>This is a tool tip for node 1</Text> // doesn't do anything, for a reason that is unknown
+  //     // console.log("clicked");
+  //   )
+  // }
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const handleClick = (event) => {
+    console.log("event.currentTarget: " + event.currentTarget);
+    setAnchorEl(event.currentTarget);
+  };
+
+  // const onNodeMouseEnter = (event) => {
+  //   // return (
+  //     setAnchorEl(event.currentTarget);
+  //     // <Text>Lorem ipsum dolor sit amet</Text>
+  //     // console.log("entered")
+  //   // )
+  // }
+  
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? "simple-popover" : undefined;
   return (
     <ReactFlow
       nodes={nodes}
@@ -71,12 +87,27 @@ const OverviewFlow = () => {
       onEdgesChange={onEdgesChange}
       onConnect={onConnect}
       onInit={onInit}
-      onNodeClick={onNodeClick}
-      onNodeMouseEnter={onNodeMouseEnter}
+      onNodeMouseEnter={(event, element) => {
+        // console.log("click", element);
+        handleClick(event);
+      }}
+      onNodeMouseLeave={(event, element) => {
+        // console.log("mouse left", event, element);
+        // handleClose();
+        // handleClick(event);
+        // setAnchorEl(null);
+      }}
+      // onNodeClick={(event, element) => {
+      //   console.log("click", element);
+      //   handleClick(event);
+      // }}
+      // onNodeClick={onNodeClick}
+      // onNodeMouseEnter={onNodeMouseEnter}
       fitView
       attributionPosition="top-right"
     >
       <Popover
+        class="pointer-events-auto"
         id={id}
         open={open}
         anchorEl={anchorEl}
@@ -90,7 +121,7 @@ const OverviewFlow = () => {
           horizontal: "center"
         }}
       >
-        <Typography>The content of the Popover.</Typography>
+        <Button>Edit</Button>
       </Popover>
       <MiniMap
         nodeStrokeColor={(n) => {
