@@ -9,6 +9,7 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { Text } from "@fluentui/react";
+import { Typography, Popover } from "@material-ui/core";
 
 import {
   nodes as initialNodes,
@@ -52,7 +53,14 @@ const OverviewFlow = () => {
   
   const onNodeClick = () => {
     return (
-      <Text>This is a tool tip for node 1</Text>
+      <Text>This is a tool tip for node 1</Text> // doesn't do anything, for a reason that is unknown
+      // console.log("clicked");
+    )
+  }
+  const onNodeMouseEnter = () => {
+    return (
+      <Text>Lorem ipsum dolor sit amet</Text>
+      // console.log("entered")
     )
   }
   return (
@@ -64,9 +72,26 @@ const OverviewFlow = () => {
       onConnect={onConnect}
       onInit={onInit}
       onNodeClick={onNodeClick}
+      onNodeMouseEnter={onNodeMouseEnter}
       fitView
       attributionPosition="top-right"
     >
+      <Popover
+        id={id}
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "center"
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "center"
+        }}
+      >
+        <Typography>The content of the Popover.</Typography>
+      </Popover>
       <MiniMap
         nodeStrokeColor={(n) => {
           if (n.style?.background) return n.style.background;
