@@ -41,12 +41,12 @@ export const nodes = [
       )
     },
     position: { x: -50, y: 225 },
-    style: {
-      background: "#D6D5E6",
-      color: "#333",
-      border: "1px solid #222138",
-      width: 180
-    }
+    // style: {
+    //   background: "#D6D5E6",
+    //   color: "#333",
+    //   border: "1px solid #222138",
+    //   width: 180
+    // }
   },
   {
     id: "4",
