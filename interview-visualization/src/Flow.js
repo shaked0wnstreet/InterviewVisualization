@@ -10,74 +10,60 @@ import ReactFlow, {
 import "reactflow/dist/style.css";
 //import { Text } from "@fluentui/react";
 import { Button, Popover } from "@material-ui/core";
-
+//import Typography from '@mui/material/Typography';
 import {
     nodes as initialNodes,
     edges as initialEdges
 } from "./initial-elements";
+//import { useState } from 'react';
+import json from './GameDev.json';
 
-//import json from './GameDev.json';
+var newNodes = [];
+for (var i = 0; i < json["interviewerDialogs"].length; i++) {
+    var obj = {};
+    // obj.id = String(Number(json["interviewerDialogs"][i]["id"].slice(-3)) + 1);
+    obj.id = json["interviewerDialogs"][i].id;
+    obj.DialogText = json["interviewerDialogs"][i].DialogText;
+    obj.staticParams = json["interviewerDialogs"][i].staticParams;
+    obj.dynamicParms = json["interviewerDialogs"][i].dynamicParms;
+    obj.alternates = json["interviewerDialogs"][i].alternates;
+    obj.NextDialogID = json["interviewerDialogs"][i].NextDialogID;
+    obj.unrecognizedResponse = json["interviewerDialogs"][i].unrecognizedResponse;
+    obj.requireResponse = json["interviewerDialogs"][i].requireResponse;
+    obj.userInterruptionEnabled = json["interviewerDialogs"][i].userInterruptionEnabled;
+    obj.section = json["interviewerDialogs"][i].section;
 
-// var newNodes = [];
-
-// for (var i=0; i < json["interviewerDialogs"].length; i++) {
-//   var obj = {};
-
-//     // obj.id = String(Number(json["interviewerDialogs"][i]["id"].slice(-3)) + 1);
-//     obj.id = json["interviewerDialogs"][i].id;
-//     obj.DialogText = json["interviewerDialogs"][i].DialogText;
-//     obj.staticParams = json["interviewerDialogs"][i].staticParams;
-//     obj.dynamicParms = json["interviewerDialogs"][i].dynamicParms;
-//     obj.alternates = json["interviewerDialogs"][i].alternates;
-//     obj.NextDialogID = json["interviewerDialogs"][i].NextDialogID;
-//     obj.unrecognizedResponse = json["interviewerDialogs"][i].unrecognizedResponse;
-//     obj.requireResponse = json["interviewerDialogs"][i].requireResponse;
-//     obj.userInterruptionEnabled = json["interviewerDialogs"][i].userInterruptionEnabled;
-//     obj.section = json["interviewerDialogs"][i].section;
-
-//   newNodes.push(obj);
-// }
-// console.log(newNodes);
+    newNodes.push(obj);
+}
 
 const onInit = (reactFlowInstance) =>
     console.log("flow loaded:", reactFlowInstance);
 
 const OverviewFlow = () => {
+    // eslint-disable-next-line
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+    // const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
     const onConnect = useCallback(
         (params) => setEdges((eds) => addEdge(params, eds)),
         [setEdges]
     );
 
-    // const onNodeClick = () => {
-    //   return (
-    //     <Text>This is a tool tip for node 1</Text> // doesn't do anything, for a reason that is unknown
-    //     // console.log("clicked");
-    //   )
-    // }
-
     const [anchorEl, setAnchorEl] = React.useState(null);
-
-    const handleClick = (event) => {
-        console.log("event.currentTarget: " + event.currentTarget);
+    const handleHover = (event) => {
+        //console.log("handleHover: ", event.currentTarget);
         setAnchorEl(event.currentTarget);
     };
-
-    const onNodeMouseEnter = (event) => {
-        // return (
-        setAnchorEl(event.currentTarget);
-        // <Text>Lorem ipsum dolor sit amet</Text>
-        // console.log("entered")
-        // )
-    }
-
-    const handleClose = () => {
+    // const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) => {
+    //     setAnchorEl(event.currentTarget);
+    // };
+    const handlePopoverClose = () => {
         setAnchorEl(null);
     };
 
     const open = Boolean(anchorEl);
     const id = open ? "simple-popover" : undefined;
+
     return (
         <ReactFlow
             nodes={nodes}
@@ -87,14 +73,12 @@ const OverviewFlow = () => {
             onConnect={onConnect}
             onInit={onInit}
             onNodeMouseEnter={(event, element) => {
-                handleClick(event);
+                //console.log("onNodeMouseEnter:", event.currentTarget);
+                handleHover(event);
             }}
-            // onNodeClick={(event, element) => {
-            //   console.log("click", element);
-            //   handleClick(event);
+            // onNodeMouseLeave={() => {
+            //     console.log("onNodeMouseLeave activated");
             // }}
-            // onNodeClick={onNodeClick}
-            // onNodeMouseEnter={onNodeMouseEnter}
             fitView
             attributionPosition="top-right"
         >
@@ -103,7 +87,8 @@ const OverviewFlow = () => {
                 id={id}
                 open={open}
                 anchorEl={anchorEl}
-                onClose={handleClose}
+                onClose={handlePopoverClose}
+
                 anchorOrigin={{
                     vertical: "bottom",
                     horizontal: "center"
@@ -113,7 +98,33 @@ const OverviewFlow = () => {
                     horizontal: "center"
                 }}
             >
-                <Button>EDIT</Button>
+
+                <Button
+                    onClick={(event) => {
+                        console.log("Edit button clicked");
+                        //setAnchorEl(event.currentTarget);
+                    }}
+                >
+                    EDIT
+                </Button>
+                <Button
+                    onClick={(event) => {
+                        console.log("Add button clicked");
+                        //setAnchorEl(event.currentTarget);
+                    }}
+                >
+                    ADD
+                </Button>
+                <Button
+                    onClick={(event) => {
+                        console.log("Delete button clicked");
+                        //setAnchorEl(event.currentTarget);
+                    }}
+                >
+                    DELETE
+                </Button>
+
+                {/* <Typography sx={{ p: 2, border: 1, width: 400 }}>[DIALOGTEXT]</Typography> */}
 
             </Popover>
             <MiniMap
@@ -134,7 +145,7 @@ const OverviewFlow = () => {
             />
             <Controls />
             <Background color="#aaa" gap={16} />
-        </ReactFlow>
+        </ReactFlow >
     );
 };
 
