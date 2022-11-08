@@ -8,9 +8,9 @@ import ReactFlow, {
   useEdgesState
 } from "reactflow";
 import "reactflow/dist/style.css";
-import { Text } from "@fluentui/react";
+//import { Text } from "@fluentui/react";
 import { Button, Popover } from "@material-ui/core";
-
+//import Typography from '@mui/material/Typography';
 import {
   nodes as initialNodes,
   edges as initialEdges
@@ -43,106 +43,113 @@ const onInit = (reactFlowInstance) =>
   console.log("flow loaded:", reactFlowInstance);
 
 const OverviewFlow = () => {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  // const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const onConnect = useCallback(
-    (params) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges]
-  );
-  
-  // const onNodeClick = () => {
-  //   return (
-  //     <Text>This is a tool tip for node 1</Text> // doesn't do anything, for a reason that is unknown
-  //     // console.log("clicked");
-  //   )
-  // }
+    // eslint-disable-next-line
+    const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+    // const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+    const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+    const onConnect = useCallback(
+        (params) => setEdges((eds) => addEdge(params, eds)),
+        [setEdges]
+    );
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const handleHover = (event) => {
+        //console.log("handleHover: ", event.currentTarget);
+        setAnchorEl(event.currentTarget);
+    };
+    // const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) => {
+    //     setAnchorEl(event.currentTarget);
+    // };
+    const handlePopoverClose = () => {
+        setAnchorEl(null);
+    };
+
+    const open = Boolean(anchorEl);
+    const id = open ? "simple-popover" : undefined;
+
+    return (
+        <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}
+            onInit={onInit}
+            onNodeMouseEnter={(event, element) => {
+                //console.log("onNodeMouseEnter:", event.currentTarget);
+                handleHover(event);
+            }}
+            // onNodeMouseLeave={() => {
+            //     console.log("onNodeMouseLeave activated");
+            // }}
+            fitView
+            attributionPosition="top-right"
+        >
+            <Popover
+                class="pointer-events-auto"
+                id={id}
+                open={open}
+                anchorEl={anchorEl}
+                onClose={handlePopoverClose}
+
+                anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "center"
+                }}
+                transformOrigin={{
+                    vertical: "top",
+                    horizontal: "center"
+                }}
+            >
+
+                <Button
+                    onClick={(event) => {
+                        console.log("Edit button clicked");
+                        //setAnchorEl(event.currentTarget);
+                    }}
+                >
+                    EDIT
+                </Button>
+                <Button
+                    onClick={(event) => {
+                        console.log("Add button clicked");
+                        //setAnchorEl(event.currentTarget);
+                    }}
+                >
+                    ADD
+                </Button>
+                <Button
+                    onClick={(event) => {
+                        console.log("Delete button clicked");
+                        //setAnchorEl(event.currentTarget);
+                    }}
+                >
+                    DELETE
+                </Button>
+
+                {/* <Typography sx={{ p: 2, border: 1, width: 400 }}>[DIALOGTEXT]</Typography> */}
+
+            </Popover>
+            <MiniMap
+                nodeStrokeColor={(n) => {
+                    if (n.style?.background) return n.style.background;
+                    if (n.type === "input") return "#0041d0";
+                    if (n.type === "output") return "#ff0072";
+                    if (n.type === "default") return "#1a192b";
 
   const handleClick = (event) => {
     console.log("event.currentTarget: " + event.currentTarget);
     setAnchorEl(event.currentTarget);
   };
 
-  // const onNodeMouseEnter = (event) => {
-  //   // return (
-  //     setAnchorEl(event.currentTarget);
-  //     // <Text>Lorem ipsum dolor sit amet</Text>
-  //     // console.log("entered")
-  //   // )
-  // }
-  
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const open = Boolean(anchorEl);
-  const id = open ? "simple-popover" : undefined;
-  return (
-    <ReactFlow
-      nodes={nodes}
-      edges={edges}
-      onNodesChange={onNodesChange}
-      onEdgesChange={onEdgesChange}
-      onConnect={onConnect}
-      onInit={onInit}
-      onNodeMouseEnter={(event, element) => {
-        // console.log("click", element);
-        handleClick(event);
-      }}
-      onNodeMouseLeave={(event, element) => {
-        // console.log("mouse left", event, element);
-        // handleClose();
-        // handleClick(event);
-        // setAnchorEl(null);
-      }}
-      // onNodeClick={(event, element) => {
-      //   console.log("click", element);
-      //   handleClick(event);
-      // }}
-      // onNodeClick={onNodeClick}
-      // onNodeMouseEnter={onNodeMouseEnter}
-      fitView
-      attributionPosition="top-right"
-    >
-      <Popover
-        class="pointer-events-auto"
-        id={id}
-        open={open}
-        anchorEl={anchorEl}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "center"
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "center"
-        }}
-      >
-        <Button>Edit</Button>
-      </Popover>
-      <MiniMap
-        nodeStrokeColor={(n) => {
-          if (n.style?.background) return n.style.background;
-          if (n.type === "input") return "#0041d0";
-          if (n.type === "output") return "#ff0072";
-          if (n.type === "default") return "#1a192b";
-
-          return "#eee";
-        }}
-        nodeColor={(n) => {
-          if (n.style?.background) return n.style.background;
-
-          return "#fff";
-        }}
-        nodeBorderRadius={2}
-      />
-      <Controls />
-      <Background color="#aaa" gap={16} />
-    </ReactFlow>
-  );
+                    return "#fff";
+                }}
+                nodeBorderRadius={2}
+            />
+            <Controls />
+            <Background color="#aaa" gap={16} />
+        </ReactFlow >
+    );
 };
 
 export default OverviewFlow;
