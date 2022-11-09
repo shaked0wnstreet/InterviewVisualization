@@ -1,0 +1,404 @@
+{
+  "interviewerDialogs": [
+    {
+      "DialogID": "000",
+      "DialogText": "Good {{greetingTime}} {{personName}}! Thank you so much for coming in. My name is {{interviewerName}}, and I am the supervisor for this department",
+      "dynamicParams": [],
+      "staticParams": [
+        "interviewerName",
+        "greetingTime",
+        "personName"
+      ],
+      "alternates": [
+        "My name is {{interviewerName}}, and I am the supervisor for this department.",
+        "My name is {{interviewerName}}, and I am the department supervisor."
+      ],
+      "NextDialogID": "PastWork001",
+      "requireResponse": false,
+      "section": "Greeting"
+    },
+    {
+      "DialogID": "PastWork001",
+      "DialogText": "Before getting into some questions about the position, tell me, do you have any past work experience?",
+      "dynamicParams": [],
+      "staticParams": [],
+      "alternates": [
+        "Have you had any other jobs before this interview?",
+        "What other jobs have you worked before?"
+      ],
+      "filterType": "SentimentFilter",
+      "childMap": {
+        "GREATER_THAN": "PastWork002",
+        "EQUAL_TO": "PastWork002",
+        "LESS_THAN": "002"
+      },
+      "timeLimit": 30,
+      "requireResponse": true,
+      "nextTopicId": "005",
+      "section": "Education"
+    },
+    {
+      "DialogID": "PastWork002",
+      "DialogText": "Great. What did you best like about the job?",
+      "dynamicParams": [],
+      "staticParams": [],
+      "alternates": [
+        "What did you learn from this experience?",
+        "What was one thing you learned from this job experience?"
+      ],
+      "NextDialogID": "PastWork003",
+      "requireResponse": true,
+      "section": "Education"
+    },
+    {
+      "DialogID": "PastWork003",
+      "DialogText": "What challenges did you face?",
+      "dynamicParams": [],
+      "staticParams": [],
+      "alternates": [
+        "What do you think was challenging about the job?"
+      ],
+      "requiredParams": [],
+      "timeLimit": 60,
+      "NextDialogID": "004",
+      "requireResponse": true,
+      "section": "Education"
+    },
+    {
+      "DialogID": "004",
+      "DialogText": "Why are you interested in working at our company?",
+      "dynamicParams": [],
+      "staticParams": [],
+      "alternates": [
+        "How did you hear about our company?",
+        "what made you want to apply for this position?"
+      ],
+      "requiredParams": [],
+      "timeLimit": 60,
+      "NextDialogID": "005",
+      "requireResponse": true,
+      "section": "Technical"
+    },
+    {
+      "DialogID": "005",
+      "DialogText": "What do you think a QA Analyst does?",
+      "dynamicParams": [],
+      "staticParams": [],
+      "alternates": [],
+      "requiredParams": [],
+      "filterType": "SentimentFilter",
+      "childMap": {
+        "LESS_THAN": "006",
+        "GREATER_THAN": "007",
+        "EQUAL_TO": "007"
+      },
+      "timeLimit": 60,
+      "requireResponse": true,
+      "section": "Technical"
+    },
+    {
+      "DialogID": "006",
+      "DialogText": "Quality assurance or QA analysts are responsible for the final step in the development of a game, website or any software product before it is released to the public. QA analysts look for flaws and weaknesses in the program.\n",
+      "dynamicParams": [],
+      "staticParams": [],
+      "alternates": [],
+      "requiredParams": [],
+      "timeLimit": 10,
+      "NextDialogID": "007",
+      "requireResponse": false,
+      "section": "Technical"
+    },
+    {
+      "DialogID": "007",
+      "DialogText": "Would this type of work be something you are interested in doing?",
+      "dynamicParams": [],
+      "staticParams": [],
+      "alternates": [],
+      "requiredParams": [],
+      "filterType": "SentimentFilter",
+      "childMap": {
+        "LESS_THAN": "008",
+        "GREATER_THAN": "008",
+        "EQUAL_TO": "008"
+      },
+      "timeLimit": 30,
+      "requireResponse": true,
+      "section": "Technical"
+    },
+    {
+      "DialogID": "008",
+      "DialogText": "We'd like to know a little more about you. What are three things that are unique about you?",
+      "dynamicParams": [],
+      "staticParams": [],
+      "alternates": [
+        "Tell me 3 things about you that you believe are unique. ",
+        "What are your interests or hobbies?"
+      ],
+      "requiredParams": [],
+      "timeLimit": 60,
+      "NextDialogID": "009",
+      "requireResponse": true,
+      "section": "Education"
+    },
+    {
+      "DialogID": "009",
+      "DialogText": "How would you feel about a supervisor telling you that there is an area you need to improve on? Would you feel able to take the feedback and make a positive change?",
+      "dynamicParams": [],
+      "staticParams": [],
+      "alternates": [
+        "If your supervisor told you that you could improve in an area, will you be able to take that feedback and make a positive change?"
+      ],
+      "requiredParams": [],
+      "timeLimit": 30,
+      "NextDialogID": "010",
+      "requireResponse": true,
+      "section": "Education"
+    },
+    {
+      "DialogID": "010",
+      "DialogText": "In terms of technical skills, how would you rate yourself on a scale of 1 to 5? 1 would be “I can log onto my computer and check my email.” \n5 would be “I can troubleshoot software, hardware and application issues. I can figure out a solution to just about anything.” \n",
+      "dynamicParams": [],
+      "staticParams": [],
+      "alternates": [
+        "1 would be “I can log onto my computer and check my email.” \n5 would be “I can troubleshoot software, hardware and application issues. I can figure out a solution to just about anything.” \n"
+      ],
+      "requiredParams": [],
+      "filterType": "NumberEntityFilter",
+      "numberEntityPivot": 3,
+      "childMap": {
+        "LESS_THAN": "011",
+        "GREATER_THAN": "012",
+        "EQUAL_TO": "012"
+      },
+      "timeLimit": 60,
+      "requireResponse": true,
+      "section": "Technical"
+    },
+    {
+      "DialogID": "011",
+      "DialogText": "Why did you choose to rate yourself that?",
+      "dynamicParams": [],
+      "staticParams": [],
+      "alternates": [],
+      "requiredParams": [],
+      "timeLimit": 60,
+      "NextDialogID": "012",
+      "requireResponse": true,
+      "section": "Technical"
+    },
+    {
+      "DialogID": "012",
+      "DialogText": "Would you be happy in a position where you are spending more than five hours a day working on a computer? ",
+      "dynamicParams": [],
+      "staticParams": [],
+      "alternates": [],
+      "requiredParams": [],
+      "timeLimit": 30,
+      "NextDialogID": "",
+      "requireResponse": true,
+      "section": "Technical"
+    },
+    {
+      "DialogID": "013",
+      "DialogText": "If you found yourself stuck on a technical issue or an equipment problem, how would you go about finding a solution?",
+      "dynamicParams": [],
+      "staticParams": [],
+      "alternates": [
+        "How would you go about finding a solution to a technical problem?"
+      ],
+      "requiredParams": [],
+      "timeLimit": 10,
+      "NextDialogID": "014",
+      "requireResponse": true,
+      "section": "Technical"
+    },
+    {
+      "DialogID": "014",
+      "DialogText": "Do you feel that you could make it to work 90% of the time?",
+      "dynamicParams": [],
+      "staticParams": [],
+      "alternates": [],
+      "requiredParams": [],
+      "filterType": "SentimentFilter",
+      "childMap": {
+        "LESS_THAN": "015",
+        "GREATER_THAN": "016",
+        "EQUAL_TO": "016"
+      },
+      "timeLimit": 10,
+      "requireResponse": true,
+      "section": "Technical"
+    },
+    {
+      "DialogID": "015",
+      "DialogText": "What would keep you from being here regularly?",
+      "dynamicParams": [],
+      "staticParams": [],
+      "alternates": [],
+      "requiredParams": [],
+      "timeLimit": 60,
+      "NextDialogID": "016",
+      "requireResponse": true,
+      "section": "Education"
+    },
+    {
+      "DialogID": "016",
+      "DialogText": "How do you feel about sitting close to someone else or sharing a space (or equipment)?",
+      "dynamicParams": [],
+      "staticParams": [],
+      "alternates": [],
+      "requiredParams": [],
+      "timeLimit": 60,
+      "NextDialogID": "017",
+      "requireResponse": true,
+      "section": "Education"
+    },
+    {
+      "DialogID": "017",
+      "DialogText": "Are you able to focus when there are conversations  or noises near you? If not, do you have strategies to help you refocus?",
+      "dynamicParams": [],
+      "staticParams": [],
+      "alternates": [],
+      "requiredParams": [],
+      "timeLimit": 60,
+      "NextDialogID": "018",
+      "requireResponse": true,
+      "section": "Education"
+    },
+    {
+      "DialogID": "018",
+      "DialogText": "Do you feel comfortable with jokes or joking around with coworkers? ",
+      "dynamicParams": [],
+      "staticParams": [],
+      "alternates": [],
+      "requiredParams": [],
+      "timeLimit": 30,
+      "NextDialogID": "0180",
+      "requireResponse": true,
+      "section": "Education"
+    },
+    {
+      "DialogID": "0180",
+      "DialogText": "What are your best personal attributes?",
+      "dynamicParams": [],
+      "staticParams": [],
+      "alternates": [
+        "Can you tell me your 3 best personal attributes?"
+      ],
+      "requiredParams": [],
+      "timeLimit": 60,
+      "NextDialogID": "019",
+      "requireResponse": true,
+      "section": "Education"
+    },
+    {
+      "DialogID": "019",
+      "DialogText": "How do you feel when working under a deadline?",
+      "dynamicParams": [],
+      "staticParams": [],
+      "alternates": [],
+      "requiredParams": [],
+      "timeLimit": 60,
+      "NextDialogID": "020",
+      "requireResponse": true,
+      "section": "Education"
+    },
+    {
+      "DialogID": "020",
+      "DialogText": "Are you able to recognize when you need a break?",
+      "dynamicParams": [],
+      "staticParams": [],
+      "alternates": [
+        "Can you recognize when you need a break?"
+      ],
+      "requiredParams": [],
+      "timeLimit": 10,
+      "NextDialogID": "Drive001",
+      "requireResponse": true,
+      "section": "Education"
+    },
+    {
+      "DialogID": "Drive001",
+      "DialogText": "How would you get to this place? Do you have a driver's license?",
+      "dynamicParams": [],
+      "staticParams": [],
+      "alternates": [
+        "Will you be driving to work everyday?"
+      ],
+      "requiredParams": [],
+      "timeLimit": 30,
+      "NextDialogID": "Drive002",
+      "requireResponse": true,
+      "section": "Education"
+    },
+    {
+      "DialogID": "Drive002",
+      "DialogText": "How would you feel on your commute? ",
+      "dynamicParams": [],
+      "staticParams": [],
+      "alternates": [
+        "Would you expect to get to Aspiritech ready to work?"
+      ],
+      "requiredParams": [],
+      "timeLimit": 30,
+      "NextDialogID": "survey001",
+      "requireResponse": true,
+      "section": "Education"
+    },
+    {
+      "DialogID": "survey001",
+      "DialogText": "That was the last question of this interview, please fill out this survey!",
+      "dynamicParams": [],
+      "staticParams": [],
+      "alternates": [
+        "Thanks for coming in. Enjoy the rest of the day!",
+        "It was great meeting you today. Thank you for coming in."
+      ],
+      "requireResponse": false,
+      "NextDialogID": "survey002",
+      "section": "Education"
+    },
+    {
+      "DialogID": "survey002",
+      "whiteboardType": "stress",
+      "count": 8,
+      "NextDialogID": "question001",
+      "section": "Education"
+    },
+    {
+      "DialogID": "question001",
+      "DialogText": "Alright, Do you have any questions for me about the job or our organization?",
+      "filterType": "SentimentFilter",
+      "childMap": {
+        "LESS_THAN": "ending001",
+        "GREATER_THAN": "question001",
+        "EQUAL_TO": "question001"
+      },
+      "questionSection": true,
+      "requireResponse": true,
+      "timeLimit": 10,
+      "NextDialogID": "ending001",
+      "section": "Education",
+      "script": "QAAnalyst_ExternalQs"
+    },
+    {
+      "DialogID": "ending001",
+      "DialogText": " thank you for coming in today, please have a great day!",
+      "dynamicParams": [],
+      "staticParams": [],
+      "alternates": [
+        "Thanks for coming in. Enjoy the rest of the day!",
+        "It was great meeting you today. Thank you for coming in."
+      ],
+      "timeLimit": 10,
+      "finalQuestion": true,
+      "requireResponse": false,
+      "section": "Education"
+    },
+    {
+      "DialogID": "UserResponseTooLong",
+      "DialogText": "I'm sorry but we need to move on",
+      "section": "Education"
+    }
+  ]
+}

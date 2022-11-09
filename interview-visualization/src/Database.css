@@ -1,0 +1,21 @@
+
+
+  
+  button:hover {
+    background-color: #cfd8dc;
+  }
+  .root{
+    background-color: white;
+    max-width: auto;
+    min-height: 10px;
+  }
+  .table{
+    background-color: white;
+    padding-top: 2em;
+    padding: 10px;
+    margin: auto;
+    min-height: 10px;
+
+  }
+
+  

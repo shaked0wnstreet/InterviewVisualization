@@ -1,8 +1,10 @@
 //import logo from './logo.svg';
 import './App.css';
-import PopUpForm  from './component/PopUpForm';
+import PopUpForm  from './components/PopUpForm';
 import Button from '@mui/material/Button';
 import { useState } from 'react';
+import Dialogue from './components/Dialogue';
+import CirvrStudio from './pages/cirvrstudio';
 
 
 function App() {
@@ -19,3 +21,4 @@ function App() {
   );
 }
 export default App;
+

@@ -3,7 +3,8 @@ import { MenuItem, Stack, TextField, Button, Checkbox, FormControlLabel } from '
 import { useState } from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import React from "react";
-import Alternate  from './Alternate';
+import Box from '@mui/material/Box';
+//import Alternate  from './Alternate';
 
 
 function PopUpForm(props) { 
@@ -99,7 +100,23 @@ function PopUpForm(props) {
   };
 
   //For adding an alternate dialog text box
-  const [onAlternate, setOnAlternate] = useState(false);
+  const [alternateValues, setAlternateValues] = useState([{ alternate : ""}])
+
+    let handleAlternateChange = (i, e) => {
+        let newAlternateValues = [...alternateValues];
+        newAlternateValues[i][e.target.name] = e.target.value;
+        setAlternateValues(newAlternateValues);
+      }
+    
+    let addAlternateFields = () => {
+        setAlternateValues([...alternateValues, { alternate: "" }])
+      }
+    
+    let removeAlternateFields = (i) => {
+        let newAlternateValues = [...alternateValues];
+        newAlternateValues.splice(i, 1);
+        setAlternateValues(newAlternateValues)
+    }
 
   return (
     <div className='popup'>
@@ -111,6 +128,7 @@ function PopUpForm(props) {
             label="Dialog ID"
             placeholder="001"
           />
+
           <TextField
           id="outlined-select-currency"
           select
@@ -125,6 +143,7 @@ function PopUpForm(props) {
             </MenuItem>
           ))}
           </TextField>
+          
         </Stack>
         <TextField
           id="filled-multiline-static"
@@ -147,19 +166,35 @@ function PopUpForm(props) {
               {option.value}
             </MenuItem>
           ))}
-        </TextField>
+        </TextField> 
 
-        <TextField
-          id="filled-multiline-static"
-          label="Alternate Dialog"
-          multiline
-          rows={1}
-          fullWidth
-          placeholder="What do you think was challenging about the job?"
-        />
         
-        <Button variant="outlined" onClick={() => setOnAlternate(true)} startIcon={<AddIcon/>}>Add Alternate</Button>
-        {onAlternate ? <Alternate setTrigger={setOnAlternate}/> : ''} 
+        {alternateValues.map((element, index) => (
+            <div key={index}>
+
+              <Stack direction='row'spacing={1}>
+                <TextField
+                  id="filled-multiline-static"
+                  label="Alternate Dialog"
+                  name="alternate"
+                  value={element.alternate || ""} onChange={e => handleAlternateChange(index, e)}
+                  multiline
+                  rows={1}
+                  fullWidth
+                  placeholder="What do you think was challenging about the job?"
+                />
+                {
+                  index ? 
+                    <button type="button" onClick={() => removeAlternateFields(index)}>-</button> 
+                    : null
+                }
+              </Stack>
+            </div>
+        ))}
+
+      <Box display="flex" justifyContent="flex-end" alignItems="flex-end">
+        <Button variant="outlined" onClick={() => addAlternateFields()} startIcon={<AddIcon/>}>Add Alternate</Button>
+      </Box>  
 
       <Stack direction='row'spacing={10}>
         <Stack direction='row'spacing={10}>
@@ -184,7 +219,7 @@ function PopUpForm(props) {
             value={interruptionType}
             disabled = {!interruption}
             onChange={onInterruptionTypeChange}
-            helperText="Please select the interruption type"
+            helperText="Please select who to interrupt"
             InputLabelProps={{
               shrink: true, 
               }}
@@ -203,6 +238,7 @@ function PopUpForm(props) {
           select          
           label="Choose expected response type"
           value={responseType}
+          disabled = {!requiredResponse}
           onChange={onResponseTypeChange}
           >
           {responseTypes.map((option) => (
@@ -217,7 +253,7 @@ function PopUpForm(props) {
           id="outlined-required"
           label="Next Dialog ID"
           required = {responseType === 'Statements'}
-          disabled = {responseType !== 'Statements'}
+          disabled = {responseType === 'Positive/Negative'}
           placeholder="001"
         />
       
