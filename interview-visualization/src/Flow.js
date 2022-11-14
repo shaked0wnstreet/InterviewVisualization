@@ -112,16 +112,32 @@ var newNodes = {
   "nodes":[]
 }
 
+var source, destination;
+
 for (var i=0; i < originalNodes["nodes"].length; i++) {
+  source = originalNodes["nodes"][i]["id"];
+  if ("NextDialogID" in originalNodes["nodes"][i]) {
+    destination = originalNodes["nodes"][i]["NextDialogID"];
+  }
+
   newNodes["nodes"][i] = {};
   newNodes["nodes"][i]["data"] = {};
-  newNodes["nodes"][i]["id"] = `"${i}"`;
+  newNodes["nodes"][i]["id"] = source;
+  //newNodes["nodes"][i]["id"] = `"${i}"`;
   newNodes["nodes"][i]["data"]["label"] = originalNodes["nodes"][i]["DialogText"];
-  newNodes["nodes"][i]["position"] = { x: 200, y: (i * 150) };
+  newNodes["nodes"][i]["position"] = { x: 200, y: (i * 200) };
+
+  if ("NextDialogID" in originalNodes["nodes"][i]) {
+    newNodes["links"][i] = {};
+    newNodes["links"][i] = { id: `${i}`, source: `${source}`, target: `${destination}`};
+    // { id: "e1-2", source: "1", target: "2", label: "" },
+  }
+  
   // console.log(newNodes["nodes"][i]);
 }
     
 console.log(newNodes["nodes"]);
+console.log(newNodes["links"]);
 
 // for (var i=0; i < json["interviewerDialogs"].length; i++) {
 //   var obj = {};
@@ -148,7 +164,7 @@ const onInit = (reactFlowInstance) =>
 const OverviewFlow = () => {
     const [nodes, setNodes, onNodesChange] = useNodesState(newNodes["nodes"]);
     // const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-    const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+    const [edges, setEdges, onEdgesChange] = useEdgesState(newNodes["links"]);
     const onConnect = useCallback(
         (params) => setEdges((eds) => addEdge(params, eds)),
         [setEdges]
