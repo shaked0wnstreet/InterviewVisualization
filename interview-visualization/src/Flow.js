@@ -457,10 +457,11 @@ let newNodes = {
   "nodes":[]
 }
 
-let currentId, previousNode, xPos, sentiment;
-const nextProps = ["NextDialogID", "NextPositiveID", "NextNegativeID"];
 
 for (let i=0; i < originalNodes["nodes"].length; i++) {
+  let currentId, previousNode;
+  const nextProps = ["NextDialogID", "NextPositiveID", "NextNegativeID"];
+
   currentId = originalNodes["nodes"][i]["id"];
 
   newNodes["nodes"][i] = {};
@@ -483,7 +484,8 @@ for (let i=0; i < originalNodes["nodes"].length; i++) {
   } else { // otherwise, dynamically add every other node
     nextProps.forEach((nextProp) => {
       if (previousNode = newNodes["nodes"].find(node => node[nextProp] == currentId)) {
-        xPos = previousNode["position"].x;
+        let xPos = previousNode["position"].x;
+        let sentiment = "";
 
         if (nextProp == "NextPositiveID") {
           xPos -= 200; // subtract 200 in order to place it on the left side
