@@ -478,10 +478,13 @@ for (let i=0; i < originalNodes["nodes"].length; i++) {
     }
   });
 
-  if (i == 0) { // if it's the first node, add it to the center of the graph
+  // If it's the first node, add it to the center of the graph
+  if (i == 0) { 
     newNodes["nodes"][i]["type"] = "input";
     newNodes["nodes"][i]["position"] = { x: 200, y: 200};
-  } else { // otherwise, dynamically add every other node
+    
+  // Otherwise, dynamically add every other node  
+  } else { 
     nextProps.forEach((nextProp) => {
       if (previousNode = newNodes["nodes"].find(node => node[nextProp] == currentId)) {
         let xPos = previousNode["position"].x;
