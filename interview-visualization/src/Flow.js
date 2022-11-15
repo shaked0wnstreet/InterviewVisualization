@@ -171,19 +171,17 @@ const OverviewFlow = () => {
     );
 
     const [anchorEl, setAnchorEl] = React.useState(null);
-    const handleHover = (event) => {
-        // console.log("handleHover: ", event.currentTarget);
+
+    const handlePopoverOpen = (event) => {
         setAnchorEl(event.currentTarget);
     };
-    // const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) => {
-    //     setAnchorEl(event.currentTarget);
-    // };
     const handlePopoverClose = () => {
         setAnchorEl(null);
     };
 
     const open = Boolean(anchorEl);
     const id = open ? "simple-popover" : undefined;
+    let timeoutId = null;
 
     return (
         <ReactFlow
@@ -193,39 +191,42 @@ const OverviewFlow = () => {
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
             onInit={onInit}
-            onNodeMouseEnter={(event, element) => {
-                // console.log("onNodeMouseEnter:", element.id);
-                handleHover(event);
-            }}
-            onNodeMouseLeave={() => {
-                // console.log("onNodeMouseLeave activated");
-                // handlePopoverClose();
+            onNodeMouseEnter={handlePopoverOpen}
+            onMouseLeave={() => {
+              //disable this event (it will be trigger as soon at the popover opens) or use it for autoHide
+              // timeoutId = setTimeout(handlePopoverClose, 5000);
             }}
             fitView
             attributionPosition="top-right"
         >
             <Popover
-                class="pointer-events-auto"
-                id={id}
-                open={open}
-                anchorEl={anchorEl}
-                onClose={handlePopoverClose}
+              id={id}
+              open={open}
+              anchorEl={anchorEl}
+              onClose={handlePopoverClose}
 
-                anchorOrigin={{
-                    vertical: "bottom",
-                    horizontal: "center"
-                }}
-                transformOrigin={{
-                    vertical: "top",
-                    horizontal: "center"
-                }}
+              anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "center"
+              }}
+              transformOrigin={{
+                  vertical: "top",
+                  horizontal: "center"
+              }}
+              disableRestoreFocus={true}
             >
-
+              <div
+                onMouseEnter={() => clearTimeout(timeoutId)} // cancels any autohide timeouts
+                onMouseLeave={() => {
+                  //autoHide is set to one second
+                  timeoutId = setTimeout(handlePopoverClose, 1000);
+                }}
+              >
                 <Button
+                
                     onClick={(event) => {
                         console.log("Edit button clicked");
                         console.log(event.id);
-                        //setAnchorEl(event.currentTarget);
                     }}
                 >
                     EDIT
@@ -233,7 +234,6 @@ const OverviewFlow = () => {
                 <Button
                     onClick={(event) => {
                         console.log("Add button clicked");
-                        //setAnchorEl(event.currentTarget);
                     }}
                 >
                     ADD
@@ -241,14 +241,11 @@ const OverviewFlow = () => {
                 <Button
                     onClick={(event) => {
                         console.log("Delete button clicked");
-                        //setAnchorEl(event.currentTarget);
                     }}
                 >
                     DELETE
                 </Button>
-
-                {/* <Typography sx={{ p: 2, border: 1, width: 400 }}>[DIALOGTEXT]</Typography> */}
-
+                </div>
             </Popover>
             <MiniMap
                 nodeStrokeColor={(n) => {
