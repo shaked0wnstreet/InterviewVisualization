@@ -457,70 +457,74 @@ let newNodes = {
   "nodes":[]
 }
 
-for (let i=0; i < originalNodes["nodes"].length; i++) {
-  let currentId, previousNode;
-  const nextProps = ["NextDialogID", "NextPositiveID", "NextNegativeID"];
-
-  currentId = originalNodes["nodes"][i]["id"];
-
-  // Begin filling in the node with the respective properties
-  newNodes["nodes"][i] = {};
-  newNodes["links"][i] = {};
-  newNodes["nodes"][i]["data"] = {};
-  newNodes["nodes"][i]["id"] = currentId;
-  newNodes["nodes"][i]["data"]["label"] = originalNodes["nodes"][i]["DialogText"];
-
-  // Fill in the corresponding property for each node, whether the property is 
-  // 'NextDialogID', 'NextPositiveID', or 'NextNegativeID'
-  nextProps.forEach((nextProp) => {
-    if (nextProp in originalNodes["nodes"][i]) {
-      newNodes["nodes"][i][nextProp] = originalNodes["nodes"][i][nextProp];
-    }
-  });
-
-  // If it's the first node, add it to the center of the graph
-  if (i == 0) { 
-    newNodes["nodes"][i]["type"] = "input";
-    newNodes["nodes"][i]["position"] = { x: 200, y: 200};
-    
-  // Otherwise, dynamically add every other node  
-  } else { 
+function visualize() {
+  for (let i=0; i < originalNodes["nodes"].length; i++) {
+    let currentId, previousNode;
+    const nextProps = ["NextDialogID", "NextPositiveID", "NextNegativeID"];
+  
+    currentId = originalNodes["nodes"][i]["id"];
+  
+    // Begin filling in the node with the respective properties
+    newNodes["nodes"][i] = {};
+    newNodes["links"][i] = {};
+    newNodes["nodes"][i]["data"] = {};
+    newNodes["nodes"][i]["id"] = currentId;
+    newNodes["nodes"][i]["data"]["label"] = originalNodes["nodes"][i]["DialogText"];
+  
+    // Fill in the corresponding property for each node, whether the property is 
+    // 'NextDialogID', 'NextPositiveID', or 'NextNegativeID'
     nextProps.forEach((nextProp) => {
-      if (previousNode = newNodes["nodes"].find(node => node[nextProp] == currentId)) {
-        let xPos = previousNode["position"].x;
-        let sentiment = "";
-
-        if (nextProp == "NextPositiveID") {
-          xPos -= 200; // subtract 200 in order to place it on the left side
-          sentiment = "yes";
-
-        } else if (nextProp == "NextNegativeID") {
-          xPos += 200; // add 200 in order to place it on the right side
-          sentiment = "no";
-        }
-
-        newNodes["nodes"][i]["position"] = { x: xPos, y: previousNode["position"].y + 200 };
-        newNodes["links"][i] = { 
-          id: `${i}`,
-          source: `${previousNode["id"]}`,
-          target: `${currentId}`,
-          label: sentiment ? `sentiment: "${sentiment}"` : '',
-          labelStyle: { fontSize: 12 },
-          markerEnd: {
-                type: "arrowclosed",
-                strokeWidth: 2
-              }
-        };
+      if (nextProp in originalNodes["nodes"][i]) {
+        newNodes["nodes"][i][nextProp] = originalNodes["nodes"][i][nextProp];
       }
-    })
-  }
-
-  // Handle case for the node being a whiteboard question
-  if (originalNodes["nodes"][i]["whiteboardType"]) {
-    newNodes["nodes"][i]["data"]["label"] = "Whiteboard";
-    newNodes["nodes"][i]["style"] = { padding: 50 };
+    });
+  
+    // If it's the first node, add it to the center of the graph
+    if (i == 0) { 
+      newNodes["nodes"][i]["type"] = "input";
+      newNodes["nodes"][i]["position"] = { x: 200, y: 200};
+      
+    // Otherwise, dynamically add every other node  
+    } else { 
+      nextProps.forEach((nextProp) => {
+        if (previousNode = newNodes["nodes"].find(node => node[nextProp] == currentId)) {
+          let xPos = previousNode["position"].x;
+          let sentiment = "";
+  
+          if (nextProp == "NextPositiveID") {
+            xPos -= 200; // subtract 200 in order to place it on the left side
+            sentiment = "yes";
+  
+          } else if (nextProp == "NextNegativeID") {
+            xPos += 200; // add 200 in order to place it on the right side
+            sentiment = "no";
+          }
+  
+          newNodes["nodes"][i]["position"] = { x: xPos, y: previousNode["position"].y + 200 };
+          newNodes["links"][i] = { 
+            id: `${i}`,
+            source: `${previousNode["id"]}`,
+            target: `${currentId}`,
+            label: sentiment ? `sentiment: "${sentiment}"` : '',
+            labelStyle: { fontSize: 12 },
+            markerEnd: {
+                  type: "arrowclosed",
+                  strokeWidth: 2
+                }
+          };
+        }
+      })
+    }
+  
+    // Handle case for the node being a whiteboard question
+    if (originalNodes["nodes"][i]["whiteboardType"]) {
+      newNodes["nodes"][i]["data"]["label"] = "Whiteboard";
+      newNodes["nodes"][i]["style"] = { padding: 50 };
+    }
   }
 }
+
+visualize();
     
 console.log(newNodes["nodes"]);
 
