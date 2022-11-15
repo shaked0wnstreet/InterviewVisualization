@@ -463,6 +463,7 @@ for (let i=0; i < originalNodes["nodes"].length; i++) {
 
   currentId = originalNodes["nodes"][i]["id"];
 
+  // Begin filling in the node with the respective properties
   newNodes["nodes"][i] = {};
   newNodes["links"][i] = {};
   newNodes["nodes"][i]["data"] = {};
