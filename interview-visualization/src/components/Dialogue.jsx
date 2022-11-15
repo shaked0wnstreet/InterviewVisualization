@@ -28,8 +28,8 @@ export default class Dialogue extends React.Component{
             id: props.id,
             index: props.index,
             dialogueObject: props.dialogueObject,
-            model:this.props.model,
-            stringModel:this.props.stringModel,
+           // model:this.props.model,
+            //stringModel:this.props.stringModel,
            // visible: props.visible,
             size: null,
             validateStatus: null,
@@ -40,34 +40,34 @@ export default class Dialogue extends React.Component{
             timeLimit: props.dialogueObject.timeLimit,
             //errorResponse: props.dialogueObject.unrecognizedResponse,
             questionsToggle: props.questionsToggle,
-            handleDialogueChange: props.handleDialogueChange, //func
+            //handleDialogueChange: props.handleDialogueChange, //func
             handleAlternatesChange: props.handleAlternatesChange,
-            addAlternates: props.addAlternates, //func
-            deleteAlternate: props.deleteAlternate, //func
+            //addAlternates: props.addAlternates, //func
+            //deleteAlternate: props.deleteAlternate, //func
             filter: props.dialogueObject.filterType,
-            handleNextDialogIDChange: props.handleNextDialogIDChange, //func
+            //handleNextDialogIDChange: props.handleNextDialogIDChange, //func
             //handleErrorResponseChange: props.handleErrorResponseChange, //func
-            handleResponseChange: props.handleResponseChange,  //func
-            handleTimeLimitChange: props.handleTimeLimitChange, //func
+           // handleResponseChange: props.handleResponseChange,  //func
+           // handleTimeLimitChange: props.handleTimeLimitChange, //func
             handleCheckboxChange: props.handleCheckboxChange,
             //handleUserInterruptionChange: props.handleUserInterruptionChange, //func
-            handleFilterChange: props.handleFilterChange, //func
-            handleDynamicParamsChange: props.handleDynamicParamsChange, //func
-            handleRequiredParamsChange: props.handleRequiredParamsChange, //func
+            //handleFilterChange: props.handleFilterChange, //func
+            //handleDynamicParamsChange: props.handleDynamicParamsChange, //func
+            //handleRequiredParamsChange: props.handleRequiredParamsChange, //func
             //handleUpdateRequiredParamsDict: props.handleUpdateRequiredParamsDict,
             handleSectionChange: props.handleSectionChange,
             handleDialogIDChange: props.handleDialogIDChange,
             requiredParamsDict: props.requiredParamsDict,
-            handleChangePivot: props.handleChangePivot, //func
+            //handleChangePivot: props.handleChangePivot, //func
             paramsList: [] //list of dynamic params option that are available to the question from all the required params before the current dialogue id.
   
         }
 
         //this.onClose = this.onClose.bind(this);
         this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
-        this.handleCheckboxResponse= this.handleCheckboxResponse.bind(this);
-        this.handleTimeChange = this.handleTimeChange.bind(this);
-        this.handleErrorChange= this.handleErrorChange.bind(this);
+        //this.handleCheckboxResponse= this.handleCheckboxResponse.bind(this);
+        //this.handleTimeChange = this.handleTimeChange.bind(this);
+        //this.handleErrorChange= this.handleErrorChange.bind(this);
 
         if(this.state.dialogueObject.DialogID == "000"){
             this.setState({firstDialog:"disabled"})
@@ -77,7 +77,7 @@ export default class Dialogue extends React.Component{
         }
         var paramsSet= new Set()
         //this.state.handleUpdateRequiredParamsDict(this.state.dialogueObject.DialogID, this.state.dialogueObject.requiredParams)
-        for (const [key,value] of Object.entries(this.state.requiredParamsDict))
+       /* for (const [key,value] of Object.entries(this.state.requiredParamsDict))
         {
             if(parseInt(key)<=parseInt(this.state.id)){
                 if(value!=null){
@@ -89,7 +89,7 @@ export default class Dialogue extends React.Component{
             
         }
         this.state.paramsList = Array.from(paramsSet)
-        
+        */
     }
   
     
@@ -137,6 +137,7 @@ export default class Dialogue extends React.Component{
             this.setState({size: window.innerWidth-1000})
         }
     }
+    /*
     handleCheckboxResponse(event){
         const model = this.state.model
         console.log(event.target.checked)
@@ -173,6 +174,7 @@ export default class Dialogue extends React.Component{
         }
         this.props.handleFilterChange(value,this.state.id,this.state.index )
     }
+    */
 /* startDrag(ev, value) {
         ev.dataTransfer.setData("drag-item", ev.target.id);
         console.log("ans:", value)
@@ -418,7 +420,7 @@ export default class Dialogue extends React.Component{
 
 
                     <Col span={16}>
-                        {/*}
+                        {/*
                         <Form.Item label="Section">
                         <Select style={{ width: 200 }} 
                                 onChange={(event)=>this.handleSecChange(event)} 
@@ -431,9 +433,9 @@ export default class Dialogue extends React.Component{
                             <Option value="personal">Personal</Option>
                             <Option value="question">Question</Option> 
                         </Select>
-        </Form.Item>*/}
-                        
-
+        </Form.Item>
+        */}     
+{/*
     <TextField
           id="outlined-select-currency"
           select
@@ -450,7 +452,7 @@ export default class Dialogue extends React.Component{
             </MenuItem>
           ))}
     </TextField>
-          
+          */}
 
                         {this.state.dialogueObject.DialogID=="question001"?
                         (
@@ -490,7 +492,7 @@ export default class Dialogue extends React.Component{
                     </Col>
                   
                 </Row>
-               
+                     
 
                 {this.state.dialogueObject.whiteboardType==null?
                 (<div><Form.Item label="Dialogue Text" rules={[{required:true,

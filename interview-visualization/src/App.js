@@ -1137,11 +1137,10 @@ class CirvrStudio extends Component{
         return (
         
         <div style={{ height: 800 }}>
-          <OverviewFlow/>
+          <OverviewFlow questions = {json["interviewerDialogs"]}/>
          </div>
        );
-
-        
+ 
     };
 };
 
