@@ -45,7 +45,7 @@
                 "What other jobs have you worked before?"
             ],
             "filterType": "SentimentFilter",
-            "NextPostiveID": "PastWork002",
+            "NextPositiveID": "PastWork002",
             "NextNegativeID": "005",
             "timeLimit": 30,
             "requireResponse": true,
@@ -247,7 +247,7 @@
             "userInterruptionEnabled": false
         },
         {
-            "DialogID": "023",
+            "id": "023",
             "DialogText": "Now let's move on to questions about your educational background.",
             "dynamicParams": [],
             "staticParams": [],
