@@ -457,7 +457,7 @@ let newNodes = {
   "nodes":[]
 }
 
-let currentId, previousNode;
+let currentId, previousNode, xPos, sentiment;
 const nextProps = ["NextDialogID", "NextPositiveID", "NextNegativeID"];
 
 for (let i=0; i < originalNodes["nodes"].length; i++) {
@@ -478,20 +478,35 @@ for (let i=0; i < originalNodes["nodes"].length; i++) {
   });
 
   if (i == 0) { // if it's the first node, add it to the center of the graph
+    newNodes["nodes"][i]["type"] = "input";
     newNodes["nodes"][i]["position"] = { x: 200, y: 200};
   } else { // otherwise, dynamically add every other node
     nextProps.forEach((nextProp) => {
       if (previousNode = newNodes["nodes"].find(node => node[nextProp] == currentId)) {
-        let xPos = previousNode["position"].x;
+        xPos = previousNode["position"].x;
 
         if (nextProp == "NextPositiveID") {
           xPos -= 200; // subtract 200 in order to place it on the left side
+          sentiment = "yes";
+
         } else if (nextProp == "NextNegativeID") {
           xPos += 200; // add 200 in order to place it on the right side
+          sentiment = "no";
         }
 
+
         newNodes["nodes"][i]["position"] = { x: xPos, y: previousNode["position"].y + 200 };
-        newNodes["links"][i] = { id: `${i}`, source: `${previousNode["id"]}`, target: `${currentId}` };
+        newNodes["links"][i] = { 
+          id: `${i}`,
+          source: `${previousNode["id"]}`,
+          target: `${currentId}`,
+          label: sentiment ? `sentiment: "${sentiment}"` : '',
+          labelStyle: { fontSize: 12 },
+          markerEnd: {
+                type: "arrowclosed",
+                strokeWidth: 2
+              }
+        };
       }
     })
   }
