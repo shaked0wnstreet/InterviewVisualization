@@ -457,7 +457,6 @@ let newNodes = {
   "nodes":[]
 }
 
-
 for (let i=0; i < originalNodes["nodes"].length; i++) {
   let currentId, previousNode;
   const nextProps = ["NextDialogID", "NextPositiveID", "NextNegativeID"];
@@ -496,7 +495,6 @@ for (let i=0; i < originalNodes["nodes"].length; i++) {
           sentiment = "no";
         }
 
-
         newNodes["nodes"][i]["position"] = { x: xPos, y: previousNode["position"].y + 200 };
         newNodes["links"][i] = { 
           id: `${i}`,
@@ -511,6 +509,12 @@ for (let i=0; i < originalNodes["nodes"].length; i++) {
         };
       }
     })
+  }
+
+  // Handle case for the node being a whiteboard question
+  if (originalNodes["nodes"][i]["whiteboardType"]) {
+    newNodes["nodes"][i]["data"]["label"] = "Whiteboard";
+    newNodes["nodes"][i]["style"] = { padding: 50 };
   }
 }
     
