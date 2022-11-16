@@ -457,7 +457,10 @@ let newNodes = {
   "nodes":[]
 }
 
+// Dynamically generate the entire graph
 function visualize() {
+
+  // Loop through every node that is dynamically fetched
   for (let i=0; i < originalNodes["nodes"].length; i++) {
     let currentId, previousNode;
     const nextProps = ["NextDialogID", "NextPositiveID", "NextNegativeID"];
@@ -466,7 +469,6 @@ function visualize() {
   
     // Begin filling in the node with the respective properties
     newNodes["nodes"][i] = {};
-    newNodes["links"][i] = {};
     newNodes["nodes"][i]["data"] = {};
     newNodes["nodes"][i]["id"] = currentId;
     newNodes["nodes"][i]["data"]["label"] = originalNodes["nodes"][i]["DialogText"];
@@ -484,9 +486,20 @@ function visualize() {
       newNodes["nodes"][i]["type"] = "input";
       newNodes["nodes"][i]["position"] = { x: 200, y: 200};
       
-    // Otherwise, dynamically add every other node  
-    } else { 
+    // Otherwise, dynamically add every other node
+    } else {
       nextProps.forEach((nextProp) => {
+
+        // If there is a previous node that is connected to the current node, whether 
+        // it's connected through NextDialogID, NextPositiveID, or NextNegativeID, store 
+        // it in a variable and then add the current node based off the position of the 
+        // previous node, as well as connect the edge
+
+        // There are nodes that only have the NextDialogID property, and others that
+        // only have both the NextPositiveID and NextNegativeID properties; if the
+        // current node doesn't have a particular property, the previousNode variable
+        // will be equal to undefined, and then the loop will continue to the next node,
+        // or property
         if (previousNode = newNodes["nodes"].find(node => node[nextProp] == currentId)) {
           let xPos = previousNode["position"].x;
           let sentiment = "";
@@ -500,9 +513,16 @@ function visualize() {
             sentiment = "no";
           }
   
+          // Add the current node using the previous node's position
           newNodes["nodes"][i]["position"] = { x: xPos, y: previousNode["position"].y + 200 };
-          newNodes["links"][i] = { 
-            id: `${i}`,
+
+          // Different edge ids will prevent two edges from having same id, 
+          // so they'll look like 1dia, 3pos, or 5neg, for example
+          let edgeId = i + nextProp.slice(4, 7).toLowerCase();
+
+          // Build the current edge, then add it to the array
+          let currentEdge = { 
+            id: `${edgeId}`,
             source: `${previousNode["id"]}`,
             target: `${currentId}`,
             label: sentiment ? `sentiment: "${sentiment}"` : '',
@@ -512,8 +532,9 @@ function visualize() {
                   strokeWidth: 2
                 }
           };
+          newNodes["links"].push(currentEdge);
         }
-      })
+      });
     }
   
     // Handle case for the node being a whiteboard question
@@ -525,8 +546,6 @@ function visualize() {
 }
 
 visualize();
-    
-console.log(newNodes["nodes"]);
 
 const onInit = (reactFlowInstance) =>
   console.log("flow loaded:", reactFlowInstance);
@@ -593,10 +612,9 @@ const OverviewFlow = () => {
                 }}
               >
                 <Button
-                
                     onClick={(event) => {
                         console.log("Edit button clicked");
-                        console.log(event.id);
+                        console.log(nodes.findIndex((node) => node["id"] == anchorEl.getAttribute("data-id")));
                     }}
                 >
                     EDIT
