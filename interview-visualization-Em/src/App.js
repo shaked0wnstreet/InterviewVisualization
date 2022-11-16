@@ -429,8 +429,8 @@ function App() {
   })
   const [interviewerDialogs, setInterviewerDialogs] = useState(jsonArray['nodes']);
 
-  function trythis() {
-    console.log(jsonArray['nodes'])
+  function OnSubmitClicked() {
+    console.log(jsonArray)
   }
   
   return (
@@ -440,7 +440,11 @@ function App() {
         <br></br>
         <Button variant="contained" onClick={() => setOnPopUp(true)}>Open PopUp</Button>
         {onPopUp ? <PopUpForm setTrigger={setOnPopUp}/> : ''} */}
-        <OverviewFlow jsonArray={jsonArray} questions={interviewerDialogs}></OverviewFlow>
+        <OverviewFlow onSubmit={OnSubmitClicked} 
+        jsonArray={jsonArray} 
+        questions={interviewerDialogs}
+        setInterviewerDialogs={setInterviewerDialogs}
+        />
       </main>
     </div>
   );

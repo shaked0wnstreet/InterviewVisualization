@@ -1,14 +1,48 @@
 import './PopUp.css';
 import { MenuItem, Stack, TextField, Button, Checkbox, FormControlLabel } from '@mui/material';
-import { useState } from 'react';
+
 import AddIcon from '@mui/icons-material/Add';
+import React from "react";
+import Box from '@mui/material/Box';
+//import Alternate  from './Alternate';
 
 
-function PopUpForm(props) {
+function PopUpForm(props) { 
 
 // Options for sections
   const sections = [
     {
+      value: 'Greetings',
+    },
+    {
+      value: 'Previous Work Experience',
+    },
+    {
+      value: 'Technical',
+    },
+    {
+      value: 'Education',
+    },
+    {
+      value: 'Personal',
+    },
+    {
+      value: 'Question',
+    },
+  ];
+
+  const interuptees = [
+    {
+      value: 'Interviewee',
+    },
+    {
+      value: 'Interviewer',
+    },
+  ];
+
+  // Options for dynamic entities
+  const entitiesOption = [
+    {
       value: 'Education',
     },
     {
@@ -19,47 +53,21 @@ function PopUpForm(props) {
     },
   ];
 
-  const [section, setSection] = useState('');
-
-  const onSectionChange = (event) => {
-    setSection(event.target.value);
-  };
-// Options for dynamic entities
-  const entities = [
-    {
-      value: 'Education',
-    },
-    {
-      value: 'Technical',
-    },
-    {
-      value: 'Past Experience',
-    },
-  ];
-
-  const [entity, setEntity] = useState('');
-
-  const onEntityChange = (event) => {
-    setEntity(event.target.value);
-  };
   // Options for response types
   const responseTypes = [
     {
-      value: 'Education',
+      value: 'Positive/Negative',
     },
     {
-      value: 'Technical',
-    },
-    {
-      value: 'Past Experience',
+      value: 'Statements', 
     },
   ];
 
-  const [responseType, setResponseType] = useState('');
+  function onSaveBtnClicked(boolVal) {
+    props.setTrigger(boolVal);
+    props.onSubmit();
 
-  const onResponseTypeChange = (event) => {
-    setResponseType(event.target.value);
-  };
+  }
   return (
     <div className='popup'>
       <Stack spacing={2} className='popup-inner'>
@@ -68,14 +76,17 @@ function PopUpForm(props) {
           <TextField
             id="outlined-required"
             label="Dialog ID"
+            value={props.dialogID}
+            onChange={(e) => props.onDialogIDChange(e)}
             placeholder="001"
           />
+
           <TextField
           id="outlined-select-currency"
           select
           label="Section"
-          value={section}
-          onChange={onSectionChange}
+          value={props.section}
+          onChange={(e) => props.onSectionChange(e)}
           helperText="Please select the interview section"
           >
           {sections.map((option) => (
@@ -84,12 +95,15 @@ function PopUpForm(props) {
             </MenuItem>
           ))}
           </TextField>
+          
         </Stack>
         <TextField
           id="filled-multiline-static"
           label="Dialog Text"
+          value ={props.dialogText}
           multiline
           rows={1}
+          onChange={(e) =>props.onDialogTextChange(e)}
           fullWidth
           placeholder="What challenges did you face?"
         />
@@ -97,58 +111,92 @@ function PopUpForm(props) {
           id="outlined-select-currency"
           select
           label="Dynamic Entities"
-          value={entity}
-          onChange={onEntityChange}
+          value={props.dynamicEntity}
+          onChange={(e) =>props.onDynamicEntityChange(e)}
           helperText="Please select the dynamic entities"
           >
-          {entities.map((option) => (
+          {entitiesOption.map((option) => (
             <MenuItem key={option.value} value={option.value}>
               {option.value}
             </MenuItem>
           ))}
-          </TextField>
-        <TextField
-        id="filled-multiline-static"
-        label="Alternate Dialog"
-        multiline
-        rows={1}
-        fullWidth
-        placeholder="What do you think was challenging about the job?"
-        />
-        <Button variant="outlined" startIcon={<AddIcon/>}>
-          Add Alternate
-        </Button>
-        <TextField
-            id="outlined-required"
-            label="Next Dialog ID"
-            placeholder="001"
-          />
+        </TextField> 
 
+        
+        {(props.alternateValues).map((element, index) => (
+            <div key={index}>
+
+              <Stack direction='row'spacing={1}>
+                <TextField
+                  id="filled-multiline-static"
+                  label="Alternate Dialog"
+                  name="alternate"
+                  value={element || ""} 
+                  onChange={(e) => props.handleAlternateChange(index, e)}
+                  multiline
+                  rows={1}
+                  fullWidth
+                  placeholder="What do you think was challenging about the job?"
+                />
+                {
+                  index ? 
+                    <button type="button" onClick={() => props.removeAlternateFields(index)}>-</button> 
+                    : null
+                }
+              </Stack>
+            </div>
+        ))}
+
+      <Box display="flex" justifyContent="flex-end" alignItems="flex-end">
+        <Button variant="outlined" onClick={() => props.addAlternateFields()} startIcon={<AddIcon/>}>Add Alternate</Button>
+      </Box>  
+
+      <Stack direction='row'spacing={10}>
         <Stack direction='row'spacing={10}>
-          <FormControlLabel labelPlacement='start' control={<Checkbox defaultChecked />} label="Require Respond?" />
+          <FormControlLabel labelPlacement='start' control={<Checkbox checked={props.requiredResponse} onChange={props.onRequiredResponseChange} />} label="Require Response?"/>
           <TextField
           id="outlined-number"
           label="Time Limit (seconds)"
           type="number"
+          onChange={(e) =>props.onTimeLimitChange(e)}
+          value={props.timeLimit}
+          disabled = {!props.requiredResponse}         //Disables Time Limit option if unchecked
           InputLabelProps={{
-            shrink: true,
+          shrink: true, 
           }}
-          />
+          />                      
+        </Stack> 
+
+        <Stack direction='row'spacing={10}>
+          <FormControlLabel labelPlacement='start' control={<Checkbox checked={props.interruption} onChange={props.onInterruptionChange} />} label="Allow Interruption?"/>
+          <TextField
+            id="outlined-select-currency"
+            select
+            label="Interruption Type"                       //userInterruptionEnabled and Interuptee
+            value={props.interruptionType}
+            disabled = {!props.requiredResponse || !props.interruption}
+            onChange={(e) =>props.onInterruptionTypeChange(e)}
+            helperText="Please select who to interrupt"
+            InputLabelProps={{
+              shrink: true, 
+              }}
+          >
+          {interuptees.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.value}
+            </MenuItem>
+          ))}
+          </TextField>                     
         </Stack>
-        <TextField
-          id="filled-multiline-static"
-          label="Entities (required)"
-          require
-          rows={1}
-          fullWidth
-          placeholder="# New Tag"
-        />
+      </Stack>
+
         <TextField
           id="outlined-select-currency"
-          select
-          label="Chose expected response type"
-          value={responseType}
-          onChange={onResponseTypeChange}
+          select          
+          label="Choose expected response type"
+          value={props.responseType}
+          disabled = {!props.requiredResponse}
+          onChange={(e) =>props.onResponseTypeChange(e)}
           >
           {responseTypes.map((option) => (
             <MenuItem key={option.value} value={option.value}>
@@ -157,9 +205,56 @@ function PopUpForm(props) {
           ))}
         </TextField>
 
+      <Stack direction='row'spacing={10}>
+        <TextField
+          id="outlined-required"
+          label="Next Dialog ID"
+          onChange={(e) =>props.onNextDialogIDChange(e)}
+          value={props.nextID}
+          required = {props.responseType === 'Statements'}
+          disabled = {!props.requiredResponse || props.responseType === 'Positive/Negative'}
+          placeholder="001"
+        />
+      
+        <TextField
+          id="outlined-required"
+          label="Next Positive ID"
+          onChange={(e) =>props.onNextPositiveIDChange(e)}
+          value={props.nextPositiveID}
+          placeholder="PastWork002"
+          required = {props.responseType === 'Positive/Negative'}
+          disabled = {!props.requiredResponse || props.responseType === 'Statements'}
+          helperText="Next ID if positive response (e.g. yes)"
+        />
+
+        <TextField
+          id="outlined-required"
+          label="Next Negative ID"
+          onChange={(e) =>props.onNextNegativeIDChange(e)}
+          value={props.nextNegativeID}
+          placeholder="002"
+          required = {props.responseType === 'Positive/Negative'}
+          disabled = {!props.requiredResponse || props.responseType === 'Statements'}
+          helperText="Next ID if negative response (e.g. no)"
+         />
+      </Stack>
+
+        <TextField 
+          id="filled-multiline-static" 
+          onChange={props.onEntitiesChange}
+          value={props.entities}
+          label="Entities (required)"   //make this to where they can click a button to add more
+          required                      //save into an array of dynamic params that can be selected up top
+          rows={1}
+          fullWidth
+          placeholder="+ New Tag"
+        />
+
+        <Button variant="outlined" startIcon={<AddIcon/>}>Add Entities</Button> 
+
         <br></br>
         <Stack direction='row'spacing={2}>
-          <Button variant="contained" className='save-btn' onClick={() => props.setTrigger(false)} >Save</Button>
+          <Button variant="contained" className='save-btn' onClick={onSaveBtnClicked} >Save</Button>
           <Button variant="contained" className='cancel-btn' color='error' onClick={() => props.setTrigger(false)} >Cancel</Button>       
         </Stack>
         

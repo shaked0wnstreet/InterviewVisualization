@@ -8,6 +8,7 @@ import ReactFlow, {
   useEdgesState
 } from "reactflow";
 import "reactflow/dist/style.css";
+import './PopUp.css';
 //import { Text } from "@fluentui/react";
 import { Button, Popover } from "@material-ui/core";
 //import Typography from '@mui/material/Typography';
@@ -15,6 +16,7 @@ import { Button, Popover } from "@material-ui/core";
 //import styled from "styled-components";
 //import CirvrStudio from "./App";
 import PopUpForm from "./PopUpForm";
+import { OndemandVideoTwoTone } from "@mui/icons-material";
 
 let newNodes = {
   "links":[],
@@ -87,13 +89,150 @@ function visualize(jsonArray) {
     }
   }
 }
-   
+const OVERLAY_STYLE = {
+  position: "fixed",
+  display: "flex",
+  justifyContent: "center",
+  top: "0",
+  left: "0",
+  width: "100%",
+  height: "100%",
+  backgroundColor: "rgba(0,0,0, .8)",
+  zIndex: "1000",
+  overflowY: "auto"
+};
+
+const MODAL_STYLES = {
+  position: "absolute",
+  backgroundColor: "#FFF",
+  padding: "15px",
+  zIndex: "1000",
+  width: "35%",
+  borderRadius: ".5em",
+  overflowY: "scroll"
+};
+
 console.log(newNodes["nodes"]);
 
 const onInit = (reactFlowInstance) =>
   console.log("flow loaded:", reactFlowInstance);
 
+
 const OverviewFlow = (props) => {
+  
+  const [aNode, setANode] = useState('')
+
+  const [dialogText, setDialogText] = useState(() => {if (aNode['DialogText']) {return aNode['DialogText']; }})
+
+  // Begin: These state object will be passed into the PopUpForm 
+  const onDialogTextChange = (e) => {
+    setDialogText(e.target.value);
+  }
+  
+  const [dialogID, setDialogID] = useState(() => {if (aNode['id']) {return aNode['id']; }})
+  
+  const onDialogIDChange = (e) => {
+    setDialogID(e.target.value);
+  }
+  
+  const [timeLimit, setTimeLimit] = useState(() => {if (aNode['timeLimit']) {return aNode['timeLimit']; }})
+  
+  // need to validate the value between 10-120 second
+  const onTimeLimitChange = (e) => {
+    setTimeLimit(e.target.value);
+  }
+  
+  const [section, setSection] = useState(() => {if (aNode['section']) {return aNode['section']; }});
+  
+  const onSectionChange = (event) => {
+    setSection(event.target.value);
+  };
+  
+  const [nextID, setNextID] = useState(() => {if (aNode['NextDialogID']) {return aNode['NextDialogID']; }});
+  
+  const onNextDialogIDChange = (event) => {
+    setNextID(event.target.value);
+  };
+  
+  const [nextPositiveID, setNextPositiveID] = useState(() => {if (aNode['NextPositiveID']) {return aNode['NextPositiveID']; }});
+  
+  const onNextPositiveIDChange = (event) => {
+    setNextPositiveID(event.target.value);
+  };
+  
+  const [nextNegativeID, setNextNegativeID] = useState(() => {if (aNode['nextNegativeID']) {return aNode['nextNegativeID']; }});
+  
+  const onNextNegativeIDChange = (event) => {
+    setNextNegativeID(event.target.value);
+  };
+  
+  const [dynamicEntity, setDynamicEntity] = useState(() => {if (aNode['dynamicParams']) {return aNode['dynamicParams']; }});
+  
+  const onDynamicEntityChange = (event) => {
+    event.preventDefault();
+    setDynamicEntity(event.target.value);
+  };
+  
+  const [entities, setEntities] = useState(() => {if (aNode['timeLimit']) {return aNode['timeLimit']; }});
+  
+  const onEntitiesChange = (event) => {
+    event.preventDefault();
+    setEntities(event.target.value);
+  };
+  
+  const [responseType, setResponseType] = useState(() => {if (aNode['timeLimit']) {return aNode['timeLimit']; }});
+  
+  const onResponseTypeChange = (event) => {
+    setResponseType(event.target.value);
+  };
+  
+  //For Required Response checkbox
+  const [requiredResponse, setRequiredResponse] = useState(true);
+  
+  const onRequiredResponseChange = () => {
+      setRequiredResponse(!requiredResponse);
+  };
+  
+  //For Interruption checkbox
+  const [interruption, setInterruption] = useState(() => {if (aNode['timeLimit']) {return aNode['timeLimit']; }});
+  
+  const onInterruptionChange = (event) => {
+      setInterruption(event.target.checked);
+  };
+  
+  const [interruptionType, setInterruptionType] = useState(() => {if (aNode['timeLimit']) {return aNode['timeLimit']; }});
+  
+  const onInterruptionTypeChange = (event) => {
+    setInterruptionType(event.target.value);
+  };
+  
+  //For adding an alternate dialog text box
+  const [alternateValues, setAlternateValues] = useState(() => {if (aNode['alternates']) {return aNode['alternates']; }})
+  
+    let handleAlternateChange = (i, e) => {
+        let newAlternateValues = [...alternateValues];
+        newAlternateValues[i][e.target.name] = e.target.value;
+        setAlternateValues(newAlternateValues);
+      }
+    
+    let addAlternateFields = () => {
+        setAlternateValues([...alternateValues, { alternate: "" }])
+      }
+    
+    let removeAlternateFields = (i) => {
+        let newAlternateValues = [...alternateValues];
+        newAlternateValues.splice(i, 1);
+        setAlternateValues(newAlternateValues)
+    }
+
+  function onSubmitBtn(newArray) {
+    // create the node obj from the states
+    // append/ replace the node in the array
+    props.setInterviewerDialogs(newArray);
+    console.log(props.jsonArray);
+  }
+
+    // End of Pop Up Form props
     visualize(props.jsonArray);
     const [nodes, setNodes, onNodesChange] = useNodesState(newNodes["nodes"]);
     // const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
@@ -162,9 +301,10 @@ const [isModalOpen, setIsModalOpen] = useState(false);
                     <Button
                     
                         onClick={(event) => {
-                            setIsModalOpen(true)
+                            setANode(props.questions[0]);
+                            setIsModalOpen(true);
                             console.log("Edit button clicked");
-                            console.log(event.id);
+                            console.log(event.target.value);
                         }}
                     >
                         EDIT
@@ -205,7 +345,44 @@ const [isModalOpen, setIsModalOpen] = useState(false);
              <Background color="#aaa" gap={16} />
           </ReactFlow > 
           {isModalOpen ?
-          <PopUpForm setTrigger={setIsModalOpen}/>: null}
+          <div className="pop-up-form">
+            <PopUpForm 
+            setTrigger={setIsModalOpen}
+            dialogID={dialogID}
+            onDialogIDChange={onDialogIDChange}
+            section={section}
+            onSectionChange={onSectionChange}
+            dialogText={dialogText}
+            onDialogTextChange={onDialogTextChange}
+            dynamicEntity={dynamicEntity}
+            onDynamicEntityChange={onDynamicEntityChange}
+            alternateValues={alternateValues}
+            handleAlternateChange={handleAlternateChange}
+            removeAlternateFields={removeAlternateFields}
+            addAlternateFields={addAlternateFields}
+            requiredResponse={requiredResponse}
+            onRequiredResponseChange={onRequiredResponseChange}
+            onTimeLimitChange={onTimeLimitChange}
+            timeLimit={timeLimit}
+            interruption={interruption}
+            interruptionType={interruptionType}
+            onInterruptionChange={onInterruptionChange}
+            onInterruptionTypeChange={onInterruptionTypeChange}
+            responseType={responseType}
+            onResponseTypeChange={onResponseTypeChange}
+            onNextDialogIDChange={onNextDialogIDChange}
+            nextID={nextID}
+            nextPositiveID={nextPositiveID}
+            onNextPositiveIDChange={onNextPositiveIDChange}
+            nextNegativeID={nextNegativeID}
+            onNextNegativeIDChange={onNextNegativeIDChange}
+            entities={entities}
+            onEntitiesChange={onEntitiesChange}
+            onSubmit={onSubmitBtn}
+          
+          />
+          </div>
+          : null}
       </>
     );
 };
