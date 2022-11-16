@@ -583,7 +583,7 @@ const OverviewFlow = () => {
             onNodeMouseEnter={handlePopoverOpen}
             onMouseLeave={() => {
               //disable this event (it will be trigger as soon at the popover opens) or use it for autoHide
-              // timeoutId = setTimeout(handlePopoverClose, 5000);
+              timeoutId = setTimeout(handlePopoverClose, 1000);
             }}
             fitView
             attributionPosition="top-right"
@@ -595,12 +595,12 @@ const OverviewFlow = () => {
               onClose={handlePopoverClose}
 
               anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "center"
+                  vertical: "center",
+                  horizontal: "left"
               }}
               transformOrigin={{
-                  vertical: "top",
-                  horizontal: "center"
+                  vertical: "center",
+                  horizontal: "right"
               }}
               disableRestoreFocus={true}
             >
@@ -616,6 +616,7 @@ const OverviewFlow = () => {
                         console.log("Edit button clicked");
                         console.log(nodes.findIndex((node) => node["id"] == anchorEl.getAttribute("data-id")));
                     }}
+                    style={{display: "block"}}
                 >
                     EDIT
                 </Button>
@@ -623,6 +624,7 @@ const OverviewFlow = () => {
                     onClick={(event) => {
                         console.log("Add button clicked");
                     }}
+                    style={{display: "block"}}
                 >
                     ADD
                 </Button>
@@ -630,10 +632,11 @@ const OverviewFlow = () => {
                     onClick={(event) => {
                         console.log("Delete button clicked");
                     }}
+                    style={{display: "block"}}
                 >
                     DELETE
                 </Button>
-                </div>
+              </div>
             </Popover>
             <MiniMap
                 nodeStrokeColor={(n) => {
