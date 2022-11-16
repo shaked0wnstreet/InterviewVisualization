@@ -1,25 +1,5 @@
 import React from "react";
 import { Component } from "react";
-import json from './GameDev.json';
-
-var newNodes = [];
-//var nodeList = [];
-for (var i = 0; i < json["interviewerDialogs"].length; i++) {
-  var obj = {};
-  // obj.id = String(Number(json["interviewerDialogs"][i]["id"].slice(-3)) + 1);
-  obj.id = json["interviewerDialogs"][i].id;
-  obj.DialogText = json["interviewerDialogs"][i].DialogText;
-  obj.staticParams = json["interviewerDialogs"][i].staticParams;
-  obj.dynamicParms = json["interviewerDialogs"][i].dynamicParms;
-  obj.alternates = json["interviewerDialogs"][i].alternates;
-  obj.NextDialogID = json["interviewerDialogs"][i].NextDialogID;
-  obj.unrecognizedResponse = json["interviewerDialogs"][i].unrecognizedResponse;
-  obj.requireResponse = json["interviewerDialogs"][i].requireResponse;
-  obj.userInterruptionEnabled = json["interviewerDialogs"][i].userInterruptionEnabled;
-  obj.section = json["interviewerDialogs"][i].section;
-
-  newNodes.push(obj);
-}
 
 export default class APIService extends Component{
 
@@ -32,7 +12,7 @@ export default class APIService extends Component{
             node_exists: false
         }
     }
-
+    // nodeInfo - JSON dialogue object
     InitGraph(nodeInfo){
       fetch('http://localhost:5000/init', {
         method: 'PUT',
@@ -49,6 +29,8 @@ export default class APIService extends Component{
       .catch(error => console.log(error));
     };
 
+    // currNode - string DialogueID of the node you are connecting the new node from
+    // nodeInfo - JSON dialogue object
     InsertNode(currNode,nodeInfo){
       fetch('http://localhost:5000/insert_node', {
         method: 'PUT',
@@ -65,19 +47,25 @@ export default class APIService extends Component{
       .catch(error => console.log(error));
     };
     
-    InsertYesNo(currNode,nodeInfo){
+    // currNode - string DialogueID of the node you are connecting the new node from
+    // yesNode - JSON dialogue object for yes_dialogue
+    // noNode - JSON dialogue object for no_dialogue
+    InsertYesNo(currNode,yesNode, noNode){
       fetch('http://localhost:5000/insert_yes_or_no', {
         method: 'PUT',
         headers: {'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*'},
-        body: JSON.stringify({"current_node": currNode, "yes_dialogue":nodeInfo})
+        body: JSON.stringify({"current_node": currNode, "yes_dialogue": { yesNode, "no_dialogue": noNode }})
       })
         .then((response) => response.json())
         .then((data) => {
-         this.setState({node_exists: data})
+          this.setState({graph: data});
      });
     };
 
+    // sourceNode - string DialogueID of the node you are creating the new edge from
+    // targetNode - string DialogueID of the node you are connecting the new edge to
+    // type - string to specify the type of dialogue edge (followup/positive/negative) 
     CreateEdge(sourceNode,targetNode,type){
       fetch('http://localhost:5000/create_edge', {
         method: 'PUT',
@@ -87,10 +75,11 @@ export default class APIService extends Component{
       })
       .then((response) => response.json())
       .then((data) => {
-        this.setState({graph: data})
+        this.setState({graph: data});
       });
     };
 
+    // nodeID - string DialogueID of the node that is to be deleted
     DeleteNode(nodeID){
       fetch('http://localhost:5000/delete_node', {
         method: 'PUT',
@@ -101,23 +90,28 @@ export default class APIService extends Component{
       .then((response) => response.json())
       .then((data) => {
         this.setState({graph: data});
+        // removes nodeID (DialogueID) from the running list of nodes
         this.nodeList.splice(this.nodeList.indexOf(nodeID),1);
       });
     };
 
+    // sourceNode - string DialogueID of the node where the edge begins
+    // targetNode - string DialogueID of the node where the edge ends
     RemoveEdge(sourceNode,targetNode){
       fetch('http://localhost:5000/remove_edge', {
         method: 'PUT',
         headers: {'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*'},
-        body: JSON.stringify({"source_node": sourceNode, "target": targetNode})
+        body: JSON.stringify({"source_node": sourceNode, "target_node": targetNode})
       })
       .then((response) => response.json())
       .then((data) => {
-        this.setState({graph: data})
+        this.setState({graph: data});
       });
     };
 
+    // nodeName - string DialogueID of the node you are querying
+    // returns true if node exists, false if node does not exist
     ExistsNode(nodeName){
       fetch('http://localhost:5000/exists_node', {
         method: 'PUT',
@@ -127,10 +121,12 @@ export default class APIService extends Component{
       })
       .then((response) => response.json())
       .then((data) => {
-        this.setState({node_exists: data})
+        this.setState({node_exists: data});
       });
     };
 
+    // oldID - string DialogueID of the node you want to relabel
+    // newID - string DialogueID of the id you want to relabel oldID to
     RelabelNode(oldID, newID){
       fetch('http://localhost:5000/relabel_node', {
         method: 'PUT',
@@ -140,10 +136,11 @@ export default class APIService extends Component{
       })
       .then((response) => response.json())
       .then((data) => {
-        this.setState({graph: data})
+        this.setState({graph: data});
       });
     };
 
+    // nodeInfo - JSON dialogue object of the node that is to be updated
     UpdateNode(nodeInfo){
       fetch('http://localhost:5000/update_node_attrs', {
         method: 'PUT',
@@ -153,40 +150,24 @@ export default class APIService extends Component{
       })
       .then((response) => response.json())
       .then((data) => {
-        this.setState({graph: data})
+        this.setState({graph: data});
       });
     };
 
-     ResetGraph() {
-        fetch('http://localhost:5000/reset', {
-             method: 'GET',
-             headers: {'Content-Type': 'application/json',
-             'Access-Control-Allow-Origin': true,
-            }
-         })
-         .then((response) => response.json())
-         .then((data) => {
-            this.setState({graph: data})
-         });
-     };
-
-    render() {
-      if (this.testVar) {
-        // initializes the first 6 nodes from GameDev.json
-        for (var i = 0; i < 6; i++) {
-          if (!this.nodeList.includes(newNodes[0].id)) {
-            if (i===0)
-              this.InitGraph(newNodes[i]);
-            else {
-              this.InsertNode(newNodes[i-1].id,newNodes[i]);
-              this.RelabelNode("new_question",newNodes[i].id);
-            }
-          }
+    ResetGraph() {
+      fetch('http://localhost:5000/reset', {
+        method: 'GET',
+        headers: {'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': true,
         }
-        console.log(this.nodeList);
-        this.testVar = false;
-      }  
+      })
+      .then((response) => response.json())
+      .then((data) => {
+        this.setState({graph: data});
+      });
+    };
 
+    render() { 
       return (
         <div>
           {JSON.stringify(this.state.graph)}

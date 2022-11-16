@@ -1,2 +1,0 @@
-Flask_Cors==3.0.10
-regraph==2.0.1
