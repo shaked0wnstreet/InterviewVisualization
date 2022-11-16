@@ -164,6 +164,8 @@ export default class APIService extends Component{
       .then((response) => response.json())
       .then((data) => {
         this.setState({graph: data});
+        // resets list of nodes to an empty array
+        this.nodeList= [];
       });
     };
 
