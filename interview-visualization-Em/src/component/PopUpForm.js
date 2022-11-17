@@ -43,13 +43,13 @@ function PopUpForm(props) {
   // Options for dynamic entities
   const entitiesOption = [
     {
-      value: 'Education',
+      value: 'interviewerName',
     },
     {
-      value: 'Technical',
+      value: 'greetingTime',
     },
     {
-      value: 'Past Experience',
+      value: 'personName',
     },
   ];
 
@@ -67,6 +67,21 @@ function PopUpForm(props) {
     props.setTrigger(boolVal);
     props.onSubmit();
 
+  }
+
+  let handleAlternateChange = (i, e) => {
+    let newAlternateValues = [...props.alternateValues];
+    newAlternateValues[i][e.target.name] = e.target.value;
+    props.setAlternateValues(newAlternateValues);
+  }
+  let addAlternateFields = () => {
+    props.setAlternateValues([...props.alternateValues, { alternate: "" }])
+  }
+
+  let removeAlternateFields = (i) => {
+      let newAlternateValues = [...props.alternateValues];
+      newAlternateValues.splice(i, 1);
+      props.setAlternateValues(newAlternateValues)
   }
   return (
     <div className='popup'>
@@ -111,7 +126,7 @@ function PopUpForm(props) {
           id="outlined-select-currency"
           select
           label="Dynamic Entities"
-          value={props.dynamicEntity}
+          value={props.dynamicParams}
           onChange={(e) =>props.onDynamicEntityChange(e)}
           helperText="Please select the dynamic entities"
           >
@@ -132,7 +147,7 @@ function PopUpForm(props) {
                   label="Alternate Dialog"
                   name="alternate"
                   value={element || ""} 
-                  onChange={(e) => props.handleAlternateChange(index, e)}
+                  onChange={(e) => handleAlternateChange(index, e)}
                   multiline
                   rows={1}
                   fullWidth
@@ -140,7 +155,7 @@ function PopUpForm(props) {
                 />
                 {
                   index ? 
-                    <button type="button" onClick={() => props.removeAlternateFields(index)}>-</button> 
+                    <button type="button" onClick={() => removeAlternateFields(index)}>-</button> 
                     : null
                 }
               </Stack>
@@ -148,7 +163,7 @@ function PopUpForm(props) {
         ))}
 
       <Box display="flex" justifyContent="flex-end" alignItems="flex-end">
-        <Button variant="outlined" onClick={() => props.addAlternateFields()} startIcon={<AddIcon/>}>Add Alternate</Button>
+        <Button variant="outlined" onClick={() => addAlternateFields()} startIcon={<AddIcon/>}>Add Alternate</Button>
       </Box>  
 
       <Stack direction='row'spacing={10}>
@@ -168,13 +183,13 @@ function PopUpForm(props) {
         </Stack> 
 
         <Stack direction='row'spacing={10}>
-          <FormControlLabel labelPlacement='start' control={<Checkbox checked={props.interruption} onChange={props.onInterruptionChange} />} label="Allow Interruption?"/>
+          <FormControlLabel labelPlacement='start' control={<Checkbox checked={props.userInterruptionEnabled} onChange={props.onInterruptionChange} />} label="Allow Interruption?"/>
           <TextField
             id="outlined-select-currency"
             select
             label="Interruption Type"                       //userInterruptionEnabled and Interuptee
-            value={props.interruptionType}
-            disabled = {!props.requiredResponse || !props.interruption}
+            value={props.Interruptee}
+            disabled = {!props.requiredResponse || !props.userInterruptionEnabled}
             onChange={(e) =>props.onInterruptionTypeChange(e)}
             helperText="Please select who to interrupt"
             InputLabelProps={{
