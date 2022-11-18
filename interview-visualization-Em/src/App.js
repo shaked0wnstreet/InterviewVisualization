@@ -430,6 +430,7 @@ function App() {
   const [interviewerDialogs, setInterviewerDialogs] = useState(jsonArray['nodes']);
 
   function OnSubmitClicked() {
+    console.log("in App.js")
     console.log(jsonArray)
   }
   

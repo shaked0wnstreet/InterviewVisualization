@@ -24,6 +24,9 @@ let newNodes = {
 }
 
 function visualize(jsonArray) {
+
+  console.log('in visualiize');
+  console.log(jsonArray);
   for (let i=0; i < jsonArray["nodes"].length; i++) {
     let currentId, previousNode;
     const nextProps = ["NextDialogID", "NextPositiveID", "NextNegativeID"];
@@ -199,6 +202,8 @@ const OverviewFlow = (props) => {
     let newNode = createNewNodeObj()
     console.log(newNode);
     // append/ replace the node in the array
+    let dialogues = props.questions;
+    dialogues[index] = newNode;
     props.onSubmit();
 
   }
@@ -269,7 +274,8 @@ const OverviewFlow = (props) => {
     if (aNode['timeLimit']) {setTimeLimit(aNode['timeLimit'])};
 
   }
-
+console.log('in Flow component');
+console.log(props.jsonArray);
     return (
       <>
              <ReactFlow
