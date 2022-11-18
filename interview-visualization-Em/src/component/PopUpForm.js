@@ -63,8 +63,8 @@ function PopUpForm(props) {
     },
   ];
 
-  function onSaveBtnClicked(boolVal) {
-    props.setTrigger(boolVal);
+  function onSaveBtnClicked() {
+    props.setIsModalOpen(!props.isModalOpen);
     props.onSubmit();
 
   }
@@ -189,7 +189,7 @@ function PopUpForm(props) {
             select
             label="Interruption Type"                       //userInterruptionEnabled and Interuptee
             value={props.Interruptee}
-            disabled = {!props.requiredResponse || !props.userInterruptionEnabled}
+            disabled = {!props.requiredResponse & !props.userInterruptionEnabled}
             onChange={(e) =>props.onInterruptionTypeChange(e)}
             helperText="Please select who to interrupt"
             InputLabelProps={{
@@ -270,7 +270,7 @@ function PopUpForm(props) {
         <br></br>
         <Stack direction='row'spacing={2}>
           <Button variant="contained" className='save-btn' onClick={onSaveBtnClicked} >Save</Button>
-          <Button variant="contained" className='cancel-btn' color='error' onClick={() => props.setTrigger(false)} >Cancel</Button>       
+          <Button variant="contained" className='cancel-btn' color='error' onClick={() => props.setIsModalOpen(!props.isModalOpen)} >Cancel</Button>       
         </Stack>
         
       </Stack>

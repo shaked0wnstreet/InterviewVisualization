@@ -97,6 +97,7 @@ const onInit = (reactFlowInstance) =>
   console.log("flow loaded:", reactFlowInstance);
 
 let aNode = {}; 
+let index = -1;
 const OverviewFlow = (props) => {
   
   //const [aNode, setANode] = useState('');
@@ -192,20 +193,36 @@ const OverviewFlow = (props) => {
   
 
 
-  function onSubmitBtn(newArray) {
+  function onSubmitBtn() {
     // create the node obj from the states
-
+    console.log(index);
+    let newNode = createNewNodeObj()
+    console.log(newNode);
     // append/ replace the node in the array
-    setIsModalOpen(false)
-    props.setInterviewerDialogs(newArray);
-    console.log(props.jsonArray);
+    props.onSubmit();
+
   }
   // End of Pop Up Form props
-
+ 
 
   // combine the new infomation from the state container and pass it to 
   function createNewNodeObj() { 
+    let newNode = {
+      "id" : dialogID,
+      'DialogText' : dialogText,
+      "dynamicParams" : [dynamicEntity],
+      "alternates" : alternateValues,
+      "NextDialogID" : nextID,
+      'NextNegativeID' :nextNegativeID,
+      "NextPositiveID" : nextPositiveID,
+      'requireResponse' : requiredResponse,
+      'userInterruptionEnabled' : interruption,
+      'interruptee' : interruptionType,
+      'section' : section,
+      'timeLimit' : timeLimit,
+    }
 
+    return newNode;
   }
 
   visualize(props.jsonArray);
@@ -296,7 +313,7 @@ const OverviewFlow = (props) => {
                     <Button
                         onClick={(event) => {                        
                             console.log("Edit button clicked");
-                            let index = nodes.findIndex((node) => node["id"] == anchorEl.getAttribute("data-id"));
+                            index = nodes.findIndex((node) => node["id"] == anchorEl.getAttribute("data-id"));
                             //setANode(props.questions[index]);
                             aNode = props.questions[index];
                             console.log(aNode);
@@ -345,8 +362,9 @@ const OverviewFlow = (props) => {
           {isModalOpen ?
           <div className="pop-up-form">
             <PopUpForm 
-            node = {aNode}
-            setTrigger={setIsModalOpen}
+            //node = {aNode}
+            isModalOpen={isModalOpen}
+            setIsModalOpen={setIsModalOpen}
             dialogID={dialogID}
             onDialogIDChange={onDialogIDChange}
             section={section}
