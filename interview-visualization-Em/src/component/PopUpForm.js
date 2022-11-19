@@ -92,6 +92,7 @@ function PopUpForm(props) {
             id="outlined-required"
             label="Dialog ID"
             value={props.dialogID}
+            disable={false}
             onChange={(e) => props.onDialogIDChange(e)}
             placeholder="001"
           />
@@ -146,7 +147,7 @@ function PopUpForm(props) {
                   id="filled-multiline-static"
                   label="Alternate Dialog"
                   name="alternate"
-                  value={element || ""} 
+                  value={element ? element : ""} 
                   onChange={(e) => handleAlternateChange(index, e)}
                   multiline
                   rows={1}

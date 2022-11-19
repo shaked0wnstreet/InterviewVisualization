@@ -16,7 +16,7 @@ import { Button, Popover } from "@material-ui/core";
 //import styled from "styled-components";
 //import CirvrStudio from "./App";
 import PopUpForm from "./PopUpForm";
-import { AssignmentRounded, OndemandVideoTwoTone } from "@mui/icons-material";
+import { AssignmentRounded, DeleteOutlineRounded, OndemandVideoTwoTone } from "@mui/icons-material";
 
 let newNodes = {
   "links":[],
@@ -192,23 +192,38 @@ const OverviewFlow = (props) => {
   //For adding an alternate dialog text box
   const [alternateValues, setAlternateValues] = useState([{ alternate : ""}])
   
+  // End of Pop Up Form props
   
-  
-
+  // flag to trigger the action for on Save btn clicked in Pop Up Form.
+  const [onEdit, setOnEdit] = useState(false);
+  const [onAdd, setOnAdd] = useState(false);
 
   function onSubmitBtn() {
     // create the node obj from the states
     console.log(index);
-    let newNode = createNewNodeObj()
+    let newNode = createNewNodeObj();
     console.log(newNode);
-    // append/ replace the node in the array
-    let dialogues = props.questions;
-    dialogues[index] = newNode;
-    props.onSubmit();
+
+    // if it's on editting mode replace the node in the array
+    if (onEdit) { 
+      setOnEdit(false);
+      let dialogues = props.questions;
+      dialogues[index] = newNode;
+      props.onSubmit();
+    }
+    else { // if it's on adding mode replace the node in the array
+      setOnAdd(false);
+      props.jsonArray.nodes.push(newNode);
+    }
 
   }
-  // End of Pop Up Form props
- 
+
+  function DeleteNode(index) {
+    props.jsonArray.remove(1);
+    props.onSubmit();
+  }
+  
+  
 
   // combine the new infomation from the state container and pass it to 
   function createNewNodeObj() { 
@@ -257,6 +272,7 @@ const OverviewFlow = (props) => {
 
   //function to assign attribute in aNode to the state container
   function assignNode(aNode) {
+     // change the flag of onEdit so it activate the right action on submit
     if (aNode['DialogText']) {setDialogText(aNode['DialogText'])};
     if (aNode['id']) {setDialogID(aNode['id'])};
     if (aNode['timeLimit']) {setTimeLimit(aNode['timeLimit'])};
@@ -272,8 +288,28 @@ const OverviewFlow = (props) => {
     if (aNode['interruptee']) {setInterruptionType(aNode['interruptee'])};
     if (aNode['alternates']) {setAlternateValues(aNode['alternates'])};  
     if (aNode['timeLimit']) {setTimeLimit(aNode['timeLimit'])};
-
   }
+
+    //function to assign attribute in aNode to the state container
+    function assignNewNode() {
+      
+      setDialogText('');
+      setDialogID('');
+      setTimeLimit('');
+      setSection('');
+      setNextID('');
+      setNextPositiveID('');
+      setNextNegativeID('');
+      setDynamicEntity('');
+      setEntities('');
+      setResponseType('');
+      setRequiredResponse('');
+      setInterruption('');
+      setInterruptionType('');
+      setAlternateValues([{ alternate : ""}]);  
+      setTimeLimit('');
+    }
+
 console.log('in Flow component');
 console.log(props.jsonArray);
     return (
@@ -319,12 +355,14 @@ console.log(props.jsonArray);
                     <Button
                         onClick={(event) => {                        
                             console.log("Edit button clicked");
+                            setOnEdit(!onEdit);
                             index = nodes.findIndex((node) => node["id"] == anchorEl.getAttribute("data-id"));
                             //setANode(props.questions[index]);
                             aNode = props.questions[index];
                             console.log(aNode);
                             // create a function to set the value of node info to the container and call it here
                             assignNode(aNode); 
+                            console.log(onEdit);
                             setIsModalOpen(true);
                         }}
                     >
@@ -333,6 +371,12 @@ console.log(props.jsonArray);
                     <Button
                         onClick={(event) => {
                             console.log("Add button clicked");
+                            setOnAdd(!onAdd);
+                            index = props.jsonArray.nodes.length;
+                            console.log(index);
+                            assignNewNode();
+                            console.log(onEdit);                          
+                            setIsModalOpen(true);
                         }}
                     >
                         ADD
@@ -340,6 +384,9 @@ console.log(props.jsonArray);
                     <Button
                         onClick={(event) => {
                             console.log("Delete button clicked");
+                            index = nodes.findIndex((node) => node["id"] == anchorEl.getAttribute("data-id"));
+                            
+                            DeleteNode(index);
                         }}
                     >
                         DELETE
