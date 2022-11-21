@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import ReactFlow, {
   addEdge,
   MiniMap,
@@ -253,6 +253,24 @@ const OverviewFlow = (props) => {
       (params) => setEdges((eds) => addEdge(params, eds)),
       [setEdges]
   );
+
+  useEffect(() => {
+    setNodes((nds) =>
+      nds.map((node) => {
+        console.log("usurpation: ");
+        if (node.id == '1') {
+          // it's important that you create a new object here
+          // in order to notify react flow about the change
+          node.data = {
+            ...node.data,
+            DialogText: "Testing lorem ipsum dolor sit amet",
+          };
+        }
+
+        return node;
+      })
+    );
+  }, [setNodes]);
 
   const [anchorEl, setAnchorEl] = React.useState(null);
 
