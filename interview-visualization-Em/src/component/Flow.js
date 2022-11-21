@@ -275,10 +275,18 @@ const OverviewFlow = (props) => {
 
   const [anchorEl, setAnchorEl] = React.useState(null);
 
-  const handlePopoverOpen = (event) => {
+  // const handlePopoverOpen = (event) => {
+  //   console.log('HANDLEPOPOVER')
+  //   setAnchorEl(event.currentTarget);
+  // };
+
+  const onDblClick = (event) => {
+    //console.log("double click");
     setAnchorEl(event.currentTarget);
   };
+
   const handlePopoverClose = () => {
+    //console.log('handlePopoverClose')
     setAnchorEl(null);
   };
 
@@ -341,7 +349,8 @@ const OverviewFlow = (props) => {
         onEdgeUpdate={onEdgeUpdate}
         onConnect={onConnect}
         onInit={onInit}
-        onNodeMouseEnter={handlePopoverOpen}
+        onNodeDoubleClick={onDblClick}
+        //onNodeMouseEnter={handlePopoverOpen}
         onMouseLeave={() => {
           //disable this event (it will be trigger as soon at the popover opens) or use it for autoHide
           // timeoutId = setTimeout(handlePopoverClose, 5000);
