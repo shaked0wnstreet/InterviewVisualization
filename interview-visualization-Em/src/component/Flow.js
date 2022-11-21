@@ -91,10 +91,11 @@ function visualize(jsonArray) {
       newNodes["nodes"][i]["style"] = { padding: 50 };
     }
   }
+  
+    console.log("newNodes: ", newNodes["nodes"]);
 }
 
 
-console.log(newNodes["nodes"]);
 
 const onInit = (reactFlowInstance) =>
   console.log("flow loaded:", reactFlowInstance);
@@ -257,20 +258,15 @@ const OverviewFlow = (props) => {
   useEffect(() => {
     setNodes((nds) =>
       nds.map((node) => {
-        console.log("usurpation: ");
-        if (node.id == '1') {
-          // it's important that you create a new object here
-          // in order to notify react flow about the change
-          node.data = {
+        let i = props.jsonArray["nodes"].findIndex((outsideNode) => node.id == outsideNode["id"]);
+        node.data = {
             ...node.data,
-            DialogText: "Testing lorem ipsum dolor sit amet",
-          };
-        }
-
+            label: props.jsonArray["nodes"][i]["DialogText"],
+        };
         return node;
       })
     );
-  }, [setNodes]);
+  }, [JSON.stringify(props.jsonArray), setNodes]);
 
   const [anchorEl, setAnchorEl] = React.useState(null);
 
