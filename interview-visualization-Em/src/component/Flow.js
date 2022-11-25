@@ -275,11 +275,6 @@ const OverviewFlow = (props) => {
 
   const [anchorEl, setAnchorEl] = React.useState(null);
 
-  // const handlePopoverOpen = (event) => {
-  //   console.log('HANDLEPOPOVER')
-  //   setAnchorEl(event.currentTarget);
-  // };
-
   const onDblClick = (event) => {
     //console.log("double click");
     setAnchorEl(event.currentTarget);
@@ -333,7 +328,7 @@ const OverviewFlow = (props) => {
     setRequiredResponse('');
     setInterruption('');
     setInterruptionType('');
-    setAlternateValues([{ alternate: "" }]);
+    setAlternateValues([]);
     setTimeLimit('');
   }
 

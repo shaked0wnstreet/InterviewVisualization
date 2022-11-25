@@ -70,10 +70,11 @@ function PopUpForm(props) {
   }
 
   let handleAlternateChange = (i, e) => {
-    let newAlternateValues = [...props.alternateValues];
-    newAlternateValues[i][e.target.name] = e.target.value;
+    let newAlternateValues = props.alternateValues;
+    newAlternateValues[i] = e.target.value;
     props.setAlternateValues(newAlternateValues);
   }
+
   let addAlternateFields = () => {
     props.setAlternateValues([...props.alternateValues, { alternate: "" }])
   }
@@ -139,28 +140,21 @@ function PopUpForm(props) {
         </TextField> 
 
         
-        {(props.alternateValues).map((element, index) => (
-            <div key={index}>
-
-              <Stack direction='row'spacing={1}>
+        {(props.alternateValues).map((element,index) => (
+              <Stack direction='row' >
                 <TextField
                   id="filled-multiline-static"
                   label="Alternate Dialog"
                   name="alternate"
-                  value={element ? element : ""} 
+                  defaultValue={element === null ? '' : element} 
                   onChange={(e) => handleAlternateChange(index, e)}
                   multiline
                   rows={1}
                   fullWidth
                   placeholder="What do you think was challenging about the job?"
                 />
-                {
-                  index ? 
-                    <button type="button" onClick={() => removeAlternateFields(index)}>-</button> 
-                    : null
-                }
+                <button type="button" onClick={() => removeAlternateFields(index)}>-</button>
               </Stack>
-            </div>
         ))}
 
       <Box display="flex" justifyContent="flex-end" alignItems="flex-end">
