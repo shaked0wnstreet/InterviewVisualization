@@ -1,6 +1,5 @@
 import './PopUp.css';
 import { MenuItem, Stack, TextField, Button, Checkbox, FormControlLabel } from '@mui/material';
-
 import AddIcon from '@mui/icons-material/Add';
 import React from "react";
 import Box from '@mui/material/Box';
@@ -8,7 +7,6 @@ import Box from '@mui/material/Box';
 
 
 function PopUpForm(props) { 
-
 // Options for sections
   const sections = [
     {
