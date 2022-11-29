@@ -1,0 +1,30 @@
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.2);
+    overflow-y: auto;
+    display: fixed;
+    justify-content: center;
+    align-items: center;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.popup-inner {
+    position: flex;
+    padding: 32px;
+    width: calc(100% - 30px);
+
+    background-color: #fff;
+}
+
+.popup-inner .save-btn {
+    position: relative;
+}
+
+.popup-inner .cancel-btn {
+    position: relative;
+}

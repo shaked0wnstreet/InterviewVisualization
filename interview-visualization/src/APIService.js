@@ -9,9 +9,11 @@ export default class APIService extends Component{
         this.nodeList=[];
         this.state={
             graph: "",
-            node_exists: false
+            node_exists: false,
+            count: 1
         }
     }
+
     // nodeInfo - JSON dialogue object
     InitGraph(nodeInfo){
       fetch('http://localhost:5000/init', {
@@ -25,8 +27,10 @@ export default class APIService extends Component{
       .then((data) => {
         this.setState({graph: data});
         this.nodeList.push(nodeInfo.id);
+        this.testVar=false;
       })
       .catch(error => console.log(error));
+      //console.log(JSON.stringify(this.state.graph))
     };
 
     // currNode - string DialogueID of the node you are connecting the new node from
@@ -140,13 +144,14 @@ export default class APIService extends Component{
       });
     };
 
+    // nodeID - DialgoueID of node being updated
     // nodeInfo - JSON dialogue object of the node that is to be updated
     UpdateNode(nodeInfo){
       fetch('http://localhost:5000/update_node_attrs', {
         method: 'PUT',
         headers: {'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*'},
-        body: JSON.stringify({"node_to_update":nodeInfo})
+        body: JSON.stringify({"node_to_update": nodeInfo})
       })
       .then((response) => response.json())
       .then((data) => {
@@ -170,6 +175,30 @@ export default class APIService extends Component{
     };
 
     render() { 
+      if (this.testVar) {
+        // initializes graph with specific json object for demo purposes
+        this.InitGraph({
+          "id": "000",
+          "DialogText": "Good {{greetingTime}}, {{personName}}! Thank you so much for coming in. My name is {{interviewerName}}, and I am the supervisor for this department. I will be conducting this interview for the position of a Game Developer. ",
+          "dynamicParams": [],
+          "staticParams": [
+              "interviewerName",
+              "greetingTime",
+              "personName"
+          ],
+          "alternates": [
+              "My name is {{interviewerName}}, and I am the supervisor for this department.",
+              "My name is {{interviewerName}}, and I am the department supervisor."
+          ],
+          "NextDialogID": "001",
+          "unrecognizedResponse": "I'm sorry, I don't understand.",
+          "requireResponse": false,
+          "userInterruptionEnabled": false,
+          "section": "Greeting"
+      });
+      this.testVar = false;
+      }
+      //console.log(JSON.stringify(this.state.graph))
       return (
         <div>
           {JSON.stringify(this.state.graph)}
