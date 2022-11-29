@@ -12,6 +12,8 @@ Activate virtual environment
 
 `source venv/bin/activate`
 
+Add `venv` to your .gitignore file
+
 ### __Install python libraries__
 
 If the working regraph folder is already installed, delete line 2 of requirements.txt. 
