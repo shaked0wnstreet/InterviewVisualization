@@ -103,6 +103,7 @@ const onInit = (reactFlowInstance) =>
 
 let aNode = {};
 let index = -1;
+let nodeID = -1; 
 const OverviewFlow = (props) => {
 
   //const [aNode, setANode] = useState('');
@@ -202,20 +203,18 @@ const OverviewFlow = (props) => {
 
   function onSubmitBtn() {
     // create the node obj from the states
-    console.log(index);
     let newNode = createNewNodeObj();
     console.log(newNode);
-
     // if it's on editting mode replace the node in the array
     if (onEdit) {
-      setOnEdit(false);
       let dialogues = props.questions;
       dialogues[index] = newNode;
-      props.onSubmit();
+      // call the function on Edit passed from props
+      props.onEditSubmit(nodeID, newNode);
     }
-    else { // if it's on adding mode replace the node in the array
-      setOnAdd(false);
+    else { // if it's on adding mode append the node into the array
       props.jsonArray.nodes.push(newNode);
+      props.onAddSubmit(nodeID, newNode);
     }
 
   }
@@ -379,7 +378,8 @@ const OverviewFlow = (props) => {
             <Button
               onClick={(event) => {
                 console.log("Edit button clicked");
-                setOnEdit(!onEdit);
+                setOnEdit(true);
+                setOnAdd(false);
                 index = nodes.findIndex((node) => node["id"] == anchorEl.getAttribute("data-id"));
                 //setANode(props.questions[index]);
                 aNode = props.questions[index];
@@ -395,11 +395,12 @@ const OverviewFlow = (props) => {
             <Button
               onClick={(event) => {
                 console.log("Add button clicked");
-                setOnAdd(!onAdd);
+                setOnEdit(false);
+                setOnAdd(true);
                 index = props.jsonArray.nodes.length;
                 console.log(index);
                 assignNewNode();
-                console.log(onEdit);
+                console.log(onAdd);
                 setIsModalOpen(true);
               }}
             >
