@@ -14,6 +14,10 @@ export default class APIService extends Component{
         }
     }
 
+    GetGraph(){
+      return this.state.graph;
+    }
+
     // nodeInfo - JSON dialogue object
     InitGraph(nodeInfo){
       fetch('http://localhost:5000/init', {
@@ -175,8 +179,9 @@ export default class APIService extends Component{
     };
 
     render() { 
-      if (this.testVar) {
+       if (this.testVar) {
         // initializes graph with specific json object for demo purposes
+        // this.InitGraph();
         this.InitGraph({
           "id": "000",
           "DialogText": "Good {{greetingTime}}, {{personName}}! Thank you so much for coming in. My name is {{interviewerName}}, and I am the supervisor for this department. I will be conducting this interview for the position of a Game Developer. ",
@@ -196,9 +201,9 @@ export default class APIService extends Component{
           "userInterruptionEnabled": false,
           "section": "Greeting"
       });
-      this.testVar = false;
-      }
-      //console.log(JSON.stringify(this.state.graph))
+       this.testVar = false;
+       }
+      // console.log(JSON.stringify(this.state.graph))
       return (
         <div>
           {JSON.stringify(this.state.graph)}
