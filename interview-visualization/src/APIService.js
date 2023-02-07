@@ -4,7 +4,7 @@ import { Component } from "react";
 export default class APIService extends Component{
 
     constructor(props){
-        super(props);
+        super(props)
         this.testVar=true;
         this.nodeList=[];
         this.state={
@@ -12,6 +12,15 @@ export default class APIService extends Component{
             node_exists: false,
             count: 1
         }
+        
+        this.InitGraph = this.InitGraph.bind(this);
+        this.GetGraph = this.GetGraph.bind(this);
+        /*this.CreateEdge = this.CreateEdge.bind(this);
+        this.DeleteNode = this.DeleteNode.bind(this);
+        this.InsertNode = this.InsertNode.bind(this);
+        this.ResetGraph = this.ResetGraph.bind(this);
+        this.InsertYesNo = this.InsertYesNo.bind(this);
+        this.*/
     }
 
     GetGraph(){
@@ -179,13 +188,13 @@ export default class APIService extends Component{
     };
 
     render() { 
-       if (this.testVar) {
+       //if (this.testVar) {
         // initializes graph with specific json object for demo purposes
         // this.InitGraph();
-        this.InitGraph({
+        /*this.InitGraph({
           "id": "000",
           "DialogText": "Good {{greetingTime}}, {{personName}}! Thank you so much for coming in. My name is {{interviewerName}}, and I am the supervisor for this department. I will be conducting this interview for the position of a Game Developer. ",
-          "dynamicParams": [],
+          /*"dynamicParams": [],
           "staticParams": [
               "interviewerName",
               "greetingTime",
@@ -196,17 +205,17 @@ export default class APIService extends Component{
               "My name is {{interviewerName}}, and I am the department supervisor."
           ],
           "NextDialogID": "001",
-          "unrecognizedResponse": "I'm sorry, I don't understand.",
+          //"unrecognizedResponse": "I'm sorry, I don't understand.",
           "requireResponse": false,
-          "userInterruptionEnabled": false,
-          "section": "Greeting"
+          //"userInterruptionEnabled": false,
+          //"section": "Greeting"
       });
        this.testVar = false;
-       }
+       }*/
       // console.log(JSON.stringify(this.state.graph))
       return (
         <div>
-          {JSON.stringify(this.state.graph)}
+          {/*JSON.stringify(this.state.graph)*/}
         </div>)
     }
 }

@@ -10,12 +10,7 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 import './PopUp.css';
-//import { Text } from "@fluentui/react";
 import { Button, Popover } from "@material-ui/core";
-//import Typography from '@mui/material/Typography';
-//import Dialogue from "./components/Dialogue";
-//import styled from "styled-components";
-//import CirvrStudio from "./App";
 import PopUpForm from "./PopUpForm";
 import { AssignmentRounded, DeleteOutlineRounded, OndemandVideoTwoTone } from "@mui/icons-material";
 
@@ -24,78 +19,95 @@ let newNodes = {
   "nodes": []
 }
 
+let currentSelectedNode = {}
+
 function visualize(jsonArray) {
 
-  console.log('in visualiize');
-  console.log(jsonArray);
-  for (let i = 0; i < jsonArray["nodes"].length; i++) {
-    let currentId, previousNode;
-    const nextProps = ["NextDialogID", "NextPositiveID", "NextNegativeID"];
+  //console.log('in visualiize');
+  if( jsonArray!={}){
+    //console.log(jsonArray['nodes'].length);
 
-    currentId = jsonArray["nodes"][i]["id"];
+    for (let i = 0; i < jsonArray["nodes"].length; i++) {
+      let currentId, previousNode;
+      const nextProps = ["NextDialogID"];
 
-    // Begin filling in the node with the respective properties
-    newNodes["nodes"][i] = {};
-    newNodes["links"][i] = {};
-    newNodes["nodes"][i]["data"] = {};
-    newNodes["nodes"][i]["id"] = currentId;
-    newNodes["nodes"][i]["data"]["label"] = jsonArray["nodes"][i]["DialogText"];
-
-    // Fill in the corresponding property for each node, whether the property is 
-    // 'NextDialogID', 'NextPositiveID', or 'NextNegativeID'
-    nextProps.forEach((nextProp) => {
-      if (nextProp in jsonArray["nodes"][i]) {
-        newNodes["nodes"][i][nextProp] = jsonArray["nodes"][i][nextProp];
-      }
-    });
-
-    // If it's the first node, add it to the center of the graph
-    if (i == 0) {
-      newNodes["nodes"][i]["type"] = "input";
-      newNodes["nodes"][i]["position"] = { x: 200, y: 200 };
-
-      // Otherwise, dynamically add every other node  
-    } else {
+      //const nextProps = ["NextDialogID", "NextNegativeID", "NextNegativeID"];
+  
+      //var currentId = jsonArray["nodes"][i]["id"];
+      currentId = jsonArray['nodes'][i]['id']
+     // console.log(currentId)
+    
+  
+      // Begin filling in the node with the respective properties
+      newNodes["nodes"][i] = {};
+      newNodes["links"][i] = {};
+      newNodes["nodes"][i]["data"] = {};
+      newNodes["nodes"][i]["id"] = currentId;
+      newNodes["nodes"][i]["data"]["label"] = jsonArray["nodes"][i]["DialogText"];
+  
+      // Fill in the corresponding property for each node, whether the property is 
+      // 'NextDialogID', 'NextPositiveID', or 'NextNegativeID'
       nextProps.forEach((nextProp) => {
-        if (previousNode = newNodes["nodes"].find(node => node[nextProp] == currentId)) {
-          let xPos = previousNode["position"].x;
-          let sentiment = "";
-
-          if (nextProp == "NextPositiveID") {
-            xPos -= 200; // subtract 200 in order to place it on the left side
-            sentiment = "yes";
-
-          } else if (nextProp == "NextNegativeID") {
-            xPos += 200; // add 200 in order to place it on the right side
-            sentiment = "no";
-          }
-
-          newNodes["nodes"][i]["position"] = { x: xPos, y: previousNode["position"].y + 200 };
-          newNodes["links"][i] = {
-            id: `${i}`,
-            source: `${previousNode["id"]}`,
-            target: `${currentId}`,
-            label: sentiment ? `sentiment: "${sentiment}"` : '',
-            labelStyle: { fontSize: 12 },
-            markerEnd: {
-              type: "arrowclosed",
-              strokeWidth: 2
-            }
-          };
+        if (nextProp in jsonArray["nodes"][i]) {
+          newNodes["nodes"][i][nextProp] = jsonArray["nodes"][i][nextProp];
         }
-      })
-    }
-
-    // Handle case for the node being a whiteboard question
-    if (jsonArray["nodes"][i]["whiteboardType"]) {
-      newNodes["nodes"][i]["data"]["label"] = "Whiteboard";
-      newNodes["nodes"][i]["style"] = { padding: 50 };
+      });
+  
+      // If it's the first node, add it to the center of the graph
+      if (i == 0) {
+        newNodes["nodes"][i]["type"] = "input";
+        newNodes["nodes"][i]["position"] = { x: 200, y: 200 };
+  
+        // Otherwise, dynamically add every other node  
+      } else {
+        nextProps.forEach((nextProp) => {
+          console.log("nextProp", nextProp)
+          //console.log("Inside foreach", newNodes["nodes"].find(node=> {return node['NextDialogID']==currentId}))
+          
+          if (newNodes["nodes"].find(node => node[nextProp] == currentId)) {
+            //console.log
+            previousNode = newNodes["nodes"].find(node => node[nextProp] == currentId)
+            console.log("previousNode", previousNode)
+            let xPos = previousNode["position"].x;
+            console.log("xpos", xPos)
+            let sentiment = "";
+  
+            /*if (nextProp == "NextPositiveID") {
+              xPos -= 200; // subtract 200 in order to place it on the left side
+              sentiment = "yes";
+  
+            } else if (nextProp == "NextNegativeID") {
+              xPos += 200; // add 200 in order to place it on the right side
+              sentiment = "no";
+            }*/
+  
+            newNodes["nodes"][i]["position"] = { x: xPos, y: previousNode["position"].y + 200 };
+            newNodes["links"][i] = {
+              //id: `${i}`,
+              source: `${previousNode["id"]}`,
+              target: `${currentId}`,
+              label: sentiment ? `sentiment: "${sentiment}"` : '',
+              labelStyle: { fontSize: 12 },
+              markerEnd: {
+                type: "arrowclosed",
+                strokeWidth: 2
+              }
+            };
+          }
+        })
+      }
+  
+      // Handle case for the node being a whiteboard question
+      /*if (jsonArray["nodes"][i]["whiteboardType"]) {
+        newNodes["nodes"][i]["data"]["label"] = "Whiteboard";
+        newNodes["nodes"][i]["style"] = { padding: 50 };
+      }*/
     }
   }
-
+  
   console.log("newNodes: ", newNodes["nodes"]);
-}
 
+}
 
 
 const onInit = (reactFlowInstance) =>
@@ -104,11 +116,20 @@ const onInit = (reactFlowInstance) =>
 let aNode = {};
 let index = -1;
 let nodeID = -1; 
+
+
 const OverviewFlow = (props) => {
-
+  
   //const [aNode, setANode] = useState('');
+  if (props.jsonArray!={}){
+    //console.log("Overviewflow", JSON.stringify(props.jsonArray['nodes'] ))
+    visualize(props.jsonArray)
+
+  }
 
 
+  //const [graph, setGraph] = useState('')
+  //visualize(props.jsonArray)
   const [dialogText, setDialogText] = useState('')
 
   // Begin: These state object will be passed into the PopUpForm 
@@ -116,17 +137,12 @@ const OverviewFlow = (props) => {
     setDialogText(e.target.value);
   }
 
-  const [dialogID, setDialogID] = useState('')
+  const [dialogID, setDialogID] = useState('new_question')
 
   const onDialogIDChange = (e) => {
     setDialogID(e.target.value);
   }
 
-  const [timeLimit, setTimeLimit] = useState('')
-  // need to validate the value between 10-120 second
-  const onTimeLimitChange = (e) => {
-    setTimeLimit(e.target.value);
-  }
 
   const [section, setSection] = useState('');
 
@@ -140,60 +156,11 @@ const OverviewFlow = (props) => {
     setNextID(event.target.value);
   };
 
-  const [nextPositiveID, setNextPositiveID] = useState('');
 
-  const onNextPositiveIDChange = (event) => {
-    setNextPositiveID(event.target.value);
-  };
-
-  const [nextNegativeID, setNextNegativeID] = useState('');
-
-  const onNextNegativeIDChange = (event) => {
-    setNextNegativeID(event.target.value);
-  };
-
-  const [dynamicEntity, setDynamicEntity] = useState('');
-
-  const onDynamicEntityChange = (event) => {
-    event.preventDefault();
-    setDynamicEntity(event.target.value);
-  };
-
-  const [entities, setEntities] = useState('');
-
-  const onEntitiesChange = (event) => {
-    event.preventDefault();
-    setEntities(event.target.value);
-  };
-
-  const [responseType, setResponseType] = useState();
-
-  const onResponseTypeChange = (event) => {
-    setResponseType(event.target.value);
-  };
-
-  //For Required Response checkbox
-  const [requiredResponse, setRequiredResponse] = useState(true);
-
-  const onRequiredResponseChange = () => {
-    setRequiredResponse(!requiredResponse);
-  };
-
-  //For Interruption checkbox
-  const [interruption, setInterruption] = useState('');
-
-  const onInterruptionChange = (event) => {
-    setInterruption(event.target.checked);
-  };
-
-  const [interruptionType, setInterruptionType] = useState('');
-
-  const onInterruptionTypeChange = (event) => {
-    setInterruptionType(event.target.value);
-  };
-
+ 
   //For adding an alternate dialog text box
-  const [alternateValues, setAlternateValues] = useState([{ alternate: "" }])
+  //const [alternateValues, setAlternateValues] = useState([{ alternate: "" }])
+  const [alternateValues, setAlternateValues] = useState([""])
 
   // End of Pop Up Form props
 
@@ -204,23 +171,31 @@ const OverviewFlow = (props) => {
   function onSubmitBtn() {
     // create the node obj from the states
     let newNode = createNewNodeObj();
-    console.log(newNode);
+    //console.log("new node on submit:", newNode)
+    //console.log(newNode);
     // if it's on editting mode replace the node in the array
     if (onEdit) {
       let dialogues = props.questions;
       dialogues[index] = newNode;
+      
       // call the function on Edit passed from props
-      props.onEditSubmit(nodeID, newNode);
+      //sprint("Edit submit newnode", newNode)
+      props.onEditSubmit(newNode);
     }
     else { // if it's on adding mode append the node into the array
-      props.jsonArray.nodes.push(newNode);
-      props.onAddSubmit(nodeID, newNode);
+      //props.jsonArray.nodes.push(newNode);
+      props.onAddSubmit(currentSelectedNode, newNode);
+
+      currentSelectedNode = {}
     }
 
   }
 
   function DeleteNode(index) {
-    props.jsonArray.remove(1);
+    //props.jsonArray.remove(1);
+    //The delete node here should call the function 
+    //The FETCH FUNCTION FOR DELETE NODE NEEDS TO BE CALLED HERE.
+    
     props.onSubmit();
   }
 
@@ -231,17 +206,11 @@ const OverviewFlow = (props) => {
     let newNode = {
       "id": dialogID,
       'DialogText': dialogText,
-      "dynamicParams": [dynamicEntity],
       "alternates": alternateValues,
       "NextDialogID": nextID,
-      'NextNegativeID': nextNegativeID,
-      "NextPositiveID": nextPositiveID,
-      'requireResponse': requiredResponse,
-      'userInterruptionEnabled': interruption,
-      'interruptee': interruptionType,
+     // 'requireResponse': requiredResponse,
       'section': section,
-      'timeLimit': timeLimit,
-    }
+     }
 
     return newNode;
   }
@@ -259,6 +228,7 @@ const OverviewFlow = (props) => {
     [setEdges]
   );
 
+
   useEffect(() => {
     setNodes((nds) =>
       nds.map((node) => {
@@ -274,8 +244,9 @@ const OverviewFlow = (props) => {
 
   const [anchorEl, setAnchorEl] = React.useState(null);
 
-  const onDblClick = (event) => {
-    //console.log("double click");
+  const onDblClick = (event, node) => {
+    console.log("double click current node", node.id);
+    currentSelectedNode = node;
     setAnchorEl(event.currentTarget);
   };
 
@@ -296,19 +267,9 @@ const OverviewFlow = (props) => {
     // change the flag of onEdit so it activate the right action on submit
     if (aNode['DialogText']) { setDialogText(aNode['DialogText']) };
     if (aNode['id']) { setDialogID(aNode['id']) };
-    if (aNode['timeLimit']) { setTimeLimit(aNode['timeLimit']) };
     if (aNode['section']) { setSection(aNode['section']) };
     if (aNode['NextDialogID']) { setNextID(aNode['NextDialogID']) };
-    if (aNode['NextPositiveID']) { setNextPositiveID(aNode['NextPositiveID']) };
-    if (aNode['nextNegativeID']) { setNextNegativeID(aNode['nextNegativeID']) };
-    if (aNode['dynamicParams']) { setDynamicEntity(aNode['dynamicParams']) };
-    if (aNode['entities']) { setEntities(aNode['entities']) };
-    if (aNode['filterType']) { setResponseType(aNode['filterType']) };
-    if (aNode['requireResponse']) { setRequiredResponse(aNode['requireResponse']) };
-    if (aNode['userInterruptionEnabled']) { setInterruption(aNode['userInterruptionEnabled']) };
-    if (aNode['interruptee']) { setInterruptionType(aNode['interruptee']) };
     if (aNode['alternates']) { setAlternateValues(aNode['alternates']) };
-    if (aNode['timeLimit']) { setTimeLimit(aNode['timeLimit']) };
   }
 
   //function to assign attribute in aNode to the state container
@@ -316,23 +277,13 @@ const OverviewFlow = (props) => {
 
     setDialogText('');
     setDialogID('');
-    setTimeLimit('');
     setSection('');
     setNextID('');
-    setNextPositiveID('');
-    setNextNegativeID('');
-    setDynamicEntity('');
-    setEntities('');
-    setResponseType('');
-    setRequiredResponse('');
-    setInterruption('');
-    setInterruptionType('');
     setAlternateValues([]);
-    setTimeLimit('');
   }
 
-  console.log('in Flow component');
-  console.log(props.jsonArray);
+  //console.log('in Flow component');
+  //console.log(JSON.stringify(props.jsonArray['nodes'].length));
   return (
     <>
       <ReactFlow
@@ -386,7 +337,7 @@ const OverviewFlow = (props) => {
                 console.log(aNode);
                 // create a function to set the value of node info to the container and call it here
                 assignNode(aNode);
-                console.log(onEdit);
+                console.log("onEdit", onEdit);
                 setIsModalOpen(true);
               }}
             >
@@ -449,28 +400,10 @@ const OverviewFlow = (props) => {
             onSectionChange={onSectionChange}
             dialogText={dialogText}
             onDialogTextChange={onDialogTextChange}
-            dynamicEntity={dynamicEntity}
-            onDynamicEntityChange={onDynamicEntityChange}
             alternateValues={alternateValues}
             setAlternateValues={setAlternateValues}
-            requiredResponse={requiredResponse}
-            onRequiredResponseChange={onRequiredResponseChange}
-            onTimeLimitChange={onTimeLimitChange}
-            timeLimit={timeLimit}
-            interruption={interruption}
-            interruptionType={interruptionType}
-            onInterruptionChange={onInterruptionChange}
-            onInterruptionTypeChange={onInterruptionTypeChange}
-            responseType={responseType}
-            onResponseTypeChange={onResponseTypeChange}
             onNextDialogIDChange={onNextDialogIDChange}
             nextID={nextID}
-            nextPositiveID={nextPositiveID}
-            onNextPositiveIDChange={onNextPositiveIDChange}
-            nextNegativeID={nextNegativeID}
-            onNextNegativeIDChange={onNextNegativeIDChange}
-            entities={entities}
-            onEntitiesChange={onEntitiesChange}
             onSubmit={onSubmitBtn}
 
           />

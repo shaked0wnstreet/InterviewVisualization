@@ -14,29 +14,9 @@ graph = NXGraph() #initializing the graph
 def init():
     global graph
     graph = NXGraph()
-
     #Getting the init_node from the client 
     dialogue = request.get_json()["init_node"]
-    
     graph.add_nodes_from([(dialogue["id"], dialogue)])
-    # graph.add_nodes_from([("000",{
-    # "id": "000",
-    # "DialogText": "Good {{greetingTime}}, {{personName}}! Thank you so much for coming in. My name is {{interviewerName}}, and I am the supervisor for this department. I will be conducting this interview for the position of a Game Developer ",
-    # "dynamicParams": [],
-    # "staticParams": [
-    # "interviewerName",
-    # "greetingTime",
-    # "personName"
-    # ],
-    # "alternates": [
-    # "My name is {{interviewerName}}, and I am the supervisor for this department.",
-    # "My name is {{interviewerName}}, and I am the department supervisor."
-    # ],
-    # "NextDialogID": "003",
-    # "unrecognizedResponse": "I'm sorry, I don't understand.",
-    # "requireResponse": "false",
-    # "userInterruptionEnabled": "false",
-    # "section": "Greeting"})])
 
     return format_d3(graph.to_d3_json())
 
@@ -48,6 +28,7 @@ def insert_node():
 
     #Getting the message from the client. 
     dialogues = request.get_json()
+    #print("dialogues", dialogues)
     
     #get the name of the current node after which you want to add a new question
     current_node = dialogues["current_node"]
@@ -56,13 +37,17 @@ def insert_node():
     #Note: Make sure that you prompt the user to change the name of the node, otherwise there will be a clash
     #Do not allow the user to add any nodes until they have changed the name of this one. Throw an error 
     node_to_add = dialogues["node_to_add"]
-    
+    graph.add_nodes_from([(node_to_add['id'], node_to_add)])
+    graph.add_edges_from([(current_node['id'], node_to_add['id'])])
+    current_node["NextDialogID"]=node_to_add['id']
+    print("updated_node", current_node)
+    graph.update_node_attrs(current_node['id'], current_node)
     #Check to see if the current node is empty - if no then proceed. 
-    if(current_node!=None or current_node!=""):
-        out_edges = graph.out_edges(current_node) #returns an array of edges in tuple format. 
-
+    """if(current_node!=None or current_node!=""):
+        out_edges = graph.out_edges(current_node['id']) #returns an array of edges in tuple format. 
+        print("out_edges", out_edges)
         #Checking to see if the current node is not a filter node. 
-        if "filterType" not in graph.get_node(current_node).keys():
+        if "filterType" not in graph.get_node(current_node['id']).keys():
         
             #Check to see if current node has any outgoing edges 
             #in_edges = graph.in_edges(current_node)
@@ -83,14 +68,15 @@ def insert_node():
 
             #Add if current node has two outgoing edges - then it is a 
             #yes or no type of question. Adding a new node to the yes and no dialogues. 
-            """else: len(out_edges)==2:
+            else: len(out_edges)==2:
                 graph.add_nodes_from([("new_question", node_to_add)])
                 graph.add_edges_from([(out_edges[0][1], "new_question"),
                                     (out_edges[1][1], "new_question")])"""
-        else: 
-            graph.add_nodes_from([("new_question", node_to_add)])
-            graph.add_edges_from([(out_edges[0][1], "new_question"),
-                                    (out_edges[1][1], "new_question")])
+        #else: 
+        
+       ## graph.add_edges_from([(out_edges[0][1], "new_question"),
+                                    ##(out_edges[1][1], "new_question")])
+        ##@todo: allow to add many children
                 
   
     return format_d3(graph.to_d3_json())
@@ -130,7 +116,7 @@ def format_d3(data):
     new_data={}
     new_data['nodes'] = formated_nodes
     new_data['links'] = formatted_links
-    #print(new_data)
+    print(new_data)
         
     return new_data
 
@@ -373,7 +359,9 @@ def update_node_attrs():
 
     global graph
     #This is the full JSON being sent by the client 
-    node_to_update = request.get_json()
+    node_to_update = request.get_json()["node_to_update"]
+    #print(node_to_update)
+
     graph.update_node_attrs(node_to_update["id"], node_to_update)
 
     return format_d3(graph.to_d3_json())
