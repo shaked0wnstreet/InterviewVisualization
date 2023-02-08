@@ -86,18 +86,33 @@ def format_d3(data):
     #data = data.to_d3_json()
     nodes = data["nodes"]
     links = data["links"]
+    print("INPUT", nodes)
 
     #print("nodes", nodes)
 
     formated_nodes = []
     for i in nodes:
         formated_data_sample = {"id":i['id']}
+        #formated_data_sample= {'data': {'label': i['attrs']['DialogText']}}
         keys = i["attrs"].keys()
         #print(keys)
         for key in keys:
             if key!="id":
-                formated_data_sample[key] = i["attrs"][key]["data"][0]
-        #print(formated_data_sample)
+                d = i["attrs"][key]["data"]
+
+                if key=='position':
+                    formated_data_sample[key]={d[0][0]:d[0][1],d[1][0]:d[1][1]  }
+                
+                elif key =='data':
+                    formated_data_sample[key]={d[0][0]: d[0][1]}
+                else:
+                    formated_data_sample[key] = i["attrs"][key]["data"][0]
+                #if list(i["attrs"][key]["data"][0].keys())!=[]:
+                #    additional_keys = list(i['attrs'][key].keys())
+                #    for k in additional_keys:
+                #        formated_data_sample[key][k] = list(i['attrs'][key]['data'][0]['attrs'][k]["data"][0])
+        print("OUTPUT", formated_data_sample)
+        print("************************************8")
         formated_nodes.append(formated_data_sample)
             
         
@@ -360,7 +375,7 @@ def update_node_attrs():
     global graph
     #This is the full JSON being sent by the client 
     node_to_update = request.get_json()["node_to_update"]
-    #print(node_to_update)
+    print(node_to_update)
 
     graph.update_node_attrs(node_to_update["id"], node_to_update)
 

@@ -13,6 +13,9 @@ import './PopUp.css';
 import { Button, Popover } from "@material-ui/core";
 import PopUpForm from "./PopUpForm";
 import { AssignmentRounded, DeleteOutlineRounded, OndemandVideoTwoTone } from "@mui/icons-material";
+import { getStepLabelUtilityClass } from "@mui/material";
+import { amber } from "@mui/material/colors";
+import { json } from "d3";
 
 let newNodes = {
   "links": [],
@@ -24,7 +27,7 @@ let currentSelectedNode = {}
 function visualize(jsonArray) {
 
   //console.log('in visualiize');
-  if( jsonArray!={}){
+  if( jsonArray!=''){
     //console.log(jsonArray['nodes'].length);
 
     for (let i = 0; i < jsonArray["nodes"].length; i++) {
@@ -44,32 +47,30 @@ function visualize(jsonArray) {
       newNodes["nodes"][i]["data"] = {};
       newNodes["nodes"][i]["id"] = currentId;
       newNodes["nodes"][i]["data"]["label"] = jsonArray["nodes"][i]["DialogText"];
-  
+      newNodes["nodes"][i]['position'] = jsonArray['nodes'][i]['position'];
       // Fill in the corresponding property for each node, whether the property is 
       // 'NextDialogID', 'NextPositiveID', or 'NextNegativeID'
       nextProps.forEach((nextProp) => {
         if (nextProp in jsonArray["nodes"][i]) {
           newNodes["nodes"][i][nextProp] = jsonArray["nodes"][i][nextProp];
         }
+
       });
   
       // If it's the first node, add it to the center of the graph
       if (i == 0) {
         newNodes["nodes"][i]["type"] = "input";
-        newNodes["nodes"][i]["position"] = { x: 200, y: 200 };
+        //newNodes["nodes"][i]["position"] = { x: 200, y: 100 };
   
         // Otherwise, dynamically add every other node  
       } else {
         nextProps.forEach((nextProp) => {
-          console.log("nextProp", nextProp)
+          //console.log("nextProp", nextProp)
           //console.log("Inside foreach", newNodes["nodes"].find(node=> {return node['NextDialogID']==currentId}))
           
           if (newNodes["nodes"].find(node => node[nextProp] == currentId)) {
-            //console.log
             previousNode = newNodes["nodes"].find(node => node[nextProp] == currentId)
-            console.log("previousNode", previousNode)
             let xPos = previousNode["position"].x;
-            console.log("xpos", xPos)
             let sentiment = "";
   
             /*if (nextProp == "NextPositiveID") {
@@ -81,7 +82,7 @@ function visualize(jsonArray) {
               sentiment = "no";
             }*/
   
-            newNodes["nodes"][i]["position"] = { x: xPos, y: previousNode["position"].y + 200 };
+            newNodes["nodes"][i]["position"] = { x: xPos, y: previousNode["position"].y + 100 };
             newNodes["links"][i] = {
               //id: `${i}`,
               source: `${previousNode["id"]}`,
@@ -105,7 +106,9 @@ function visualize(jsonArray) {
     }
   }
   
-  console.log("newNodes: ", newNodes["nodes"]);
+  console.log("newNodes: ", newNodes);
+  //props.setNodes(newNodes['nodes'])
+  //props.setEdges(newNodes['links'])
 
 }
 
@@ -120,29 +123,27 @@ let nodeID = -1;
 
 const OverviewFlow = (props) => {
   
-  //const [aNode, setANode] = useState('');
-  if (props.jsonArray!={}){
+  
+  const [aNode, setANode] = useState('');
+  if (props.jsonArray!=''){
     //console.log("Overviewflow", JSON.stringify(props.jsonArray['nodes'] ))
     visualize(props.jsonArray)
 
   }
-
-
-  //const [graph, setGraph] = useState('')
   //visualize(props.jsonArray)
   const [dialogText, setDialogText] = useState('')
 
   // Begin: These state object will be passed into the PopUpForm 
   const onDialogTextChange = (e) => {
     setDialogText(e.target.value);
+    setLabel({label:e.target.value})
   }
 
-  const [dialogID, setDialogID] = useState('new_question')
+  const [dialogID, setDialogID] = useState('')
 
   const onDialogIDChange = (e) => {
     setDialogID(e.target.value);
   }
-
 
   const [section, setSection] = useState('');
 
@@ -157,7 +158,6 @@ const OverviewFlow = (props) => {
   };
 
 
- 
   //For adding an alternate dialog text box
   //const [alternateValues, setAlternateValues] = useState([{ alternate: "" }])
   const [alternateValues, setAlternateValues] = useState([""])
@@ -170,7 +170,7 @@ const OverviewFlow = (props) => {
 
   function onSubmitBtn() {
     // create the node obj from the states
-    let newNode = createNewNodeObj();
+    let newNode = createNewNodeObj(currentSelectedNode);
     //console.log("new node on submit:", newNode)
     //console.log(newNode);
     // if it's on editting mode replace the node in the array
@@ -181,10 +181,12 @@ const OverviewFlow = (props) => {
       // call the function on Edit passed from props
       //sprint("Edit submit newnode", newNode)
       props.onEditSubmit(newNode);
+      visualize(props.jsonArray)
     }
     else { // if it's on adding mode append the node into the array
       //props.jsonArray.nodes.push(newNode);
       props.onAddSubmit(currentSelectedNode, newNode);
+      visualize(props.jsonArray)
 
       currentSelectedNode = {}
     }
@@ -202,7 +204,7 @@ const OverviewFlow = (props) => {
 
 
   // combine the new infomation from the state container and pass it to 
-  function createNewNodeObj() {
+  function createNewNodeObj(currentNode) {
     let newNode = {
       "id": dialogID,
       'DialogText': dialogText,
@@ -210,12 +212,15 @@ const OverviewFlow = (props) => {
       "NextDialogID": nextID,
      // 'requireResponse': requiredResponse,
       'section': section,
+      'position': {'x': currentNode['position']['x'],
+                    'y': currentNode['position']['y']},
+      'data': {label: dialogText}
      }
 
     return newNode;
   }
 
-  visualize(props.jsonArray);
+  //visualize(props.jsonArray);
   const [nodes, setNodes, onNodesChange] = useNodesState(newNodes["nodes"]);
   // const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(newNodes["links"]);
@@ -228,19 +233,39 @@ const OverviewFlow = (props) => {
     [setEdges]
   );
 
+  const [position, setPosition] = useState({})
+  
+  const onPositionChange = (event) => {
+    setPosition(event.target.value);
+  };
+
 
   useEffect(() => {
-    setNodes((nds) =>
+    console.log("INSIDE USEEFFECT")
+    /*setNodes((nds) => {
+      //console.log("NOdes in Useffect", JSON.stringify(nds))
       nds.map((node) => {
-        let i = props.jsonArray["nodes"].findIndex((outsideNode) => node.id == outsideNode["id"]);
-        node.data = {
+        //console.log("Set nodes", node)
+
+      //let i = props.jsonArray["nodes"].findIndex((outsideNode) => node.id == outsideNode["id"]);
+       // console.log("i in useeffect", i)
+       let i = newNodes["nodes"].findIndex((outsideNode) => node.id == outsideNode["id"]);
+ 
+       node.data = {
           ...node.data,
-          label: props.jsonArray["nodes"][i]["DialogText"],
+          label: newNodes["nodes"][i]["DialogText"],
         };
         return node;
       })
-    );
-  }, [JSON.stringify(props.jsonArray), setNodes]);
+      //console.log("nds new", nds_new)
+      //return nds_new
+    }
+    );*/
+    visualize(props.jsonArray)
+    setNodes(newNodes['nodes'])
+    setEdges(newNodes['links'])
+
+  }, [props.jsonArray,newNodes/*, setNodes*/]);
 
   const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -261,6 +286,10 @@ const OverviewFlow = (props) => {
 
   //For form modal popup
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [data, setLabel] = useState({label: dialogText})
+  
+  
+
 
   //function to assign attribute in aNode to the state container
   function assignNode(aNode) {
@@ -270,6 +299,8 @@ const OverviewFlow = (props) => {
     if (aNode['section']) { setSection(aNode['section']) };
     if (aNode['NextDialogID']) { setNextID(aNode['NextDialogID']) };
     if (aNode['alternates']) { setAlternateValues(aNode['alternates']) };
+    if (aNode['position']) {setPosition(aNode['position'])}
+    if (aNode['data']){setLabel(aNode['data'])}
   }
 
   //function to assign attribute in aNode to the state container
@@ -280,6 +311,9 @@ const OverviewFlow = (props) => {
     setSection('');
     setNextID('');
     setAlternateValues([]);
+    setPosition({})
+    setLabel({'label': ''})
+    //visualize(jsonArray)
   }
 
   //console.log('in Flow component');
@@ -332,9 +366,10 @@ const OverviewFlow = (props) => {
                 setOnEdit(true);
                 setOnAdd(false);
                 index = nodes.findIndex((node) => node["id"] == anchorEl.getAttribute("data-id"));
-                //setANode(props.questions[index]);
-                aNode = props.questions[index];
-                console.log(aNode);
+                //console.log("index", index)
+                setANode(props.questions[index]);
+                let aNode = props.questions[index];
+                //console.log("aNode", aNode);
                 // create a function to set the value of node info to the container and call it here
                 assignNode(aNode);
                 console.log("onEdit", onEdit);

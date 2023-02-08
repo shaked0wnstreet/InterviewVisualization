@@ -7,36 +7,6 @@ import json from './GameDev.json'
 import APIService from './APIService';
 //import {InitGraph, InsertNode, RelabelNode, UpdateNode, UpdateGraph, DeleteNode} from './APIService';
 
-/*function start() {
-
-  let init_node = {
-    "id": "000",
-    "DialogText": "",
-    "NextDialogID": "",
-    "requireResponse": false,
-    "section": ""
-  }
-  var res = {}
-
-  return  fetch('http://localhost:5000/init', {
-    method: 'PUT',
-    headers: {'Content-Type': 'application/json', 
-      'Access-Control-Allow-Origin': true,
-      'Access-Control-Allow-Methods': 'GET, POST, PUT'},
-    body: JSON.stringify({"init_node": init_node}),
-   })
-  .then((response) => {return response.json().data})
-  //.then((data) => {
-    //this.setState({graph: data});
-    //this.nodeList.push(nodeInfo.id);
-    //this.testVar=false;
-    //this.setJsonArray(data)
-    //return data
-    //console.log("Inside start", JSON.stringify(data))
- // })
-  .catch(error => console.log(error));
-  //console.log("res:", JSON.stringify(res))
-};*/
 
 const  App=()=> {
   // const [onPopUp, setOnPopUp] = useState(false); 
@@ -45,15 +15,14 @@ const  App=()=> {
 
 
   useEffect(() => {
-    //console.log("Start", start());
-    //
 
     let init_node = {
-      "id": "000",
-      "DialogText": "",
-      "NextDialogID": "",
-      //"requireResponse": false,
-      "section": ""
+      id: "000",
+      DialogText: "",
+      data: {label: ""},
+      NextDialogID: "",
+      position: {x: 200, y: 50},
+      section: ""
     }
     fetch('http://localhost:5000/init', {
     method: 'PUT',
@@ -64,12 +33,9 @@ const  App=()=> {
     })
     .then((response) => response.json())
     .then((data) => {
-      //this.setState({graph: data});
-      //this.nodeList.push(nodeInfo.id);
-      //this.testVar=false;
+   
       setJsonArray(data)
       setInterviewerDialogs(data['nodes'])
-      //return data
     })
     .catch(error => console.log(error));
 
@@ -79,11 +45,6 @@ const  App=()=> {
 
   function onAddSubmit(currNode, newNode) {
 
-    // call the API to InsertNode(nodeID, newNode)
-    // setJsonArray(InsertNode(nodeID, newNode));
-
-    // call the API to RelabelNode("new_question", newNode.id)
-    // setJsonArray(RelabelNode("new_question", newNode.id)); 
     console.log("Current Selected Node", currNode)
 
     fetch('http://localhost:5000/insert_node', {
@@ -95,7 +56,7 @@ const  App=()=> {
     })
     .then((response) => response.json())
     .then((data) => {
-      console.log("On add data", JSON.stringify(data))
+      //console.log("On add data", JSON.stringify(data))
       setJsonArray(data)
       setInterviewerDialogs(data['nodes'])
 
@@ -122,17 +83,13 @@ const  App=()=> {
 
     })
     .catch(error => console.log(error));
-
-
-
   }
 
-  //start();
 
   return (
     <div className="App">
 
-      {JSON.stringify(jsonArray)}
+      {JSON.stringify(interviewerDialogs)}
       <main style={{ height: 800 }}>
         {/* <h1>React popups</h1>
         <br></br>
