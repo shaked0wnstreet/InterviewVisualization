@@ -65,12 +65,12 @@ function PopUpForm(props) {
             placeholder="001"
           />
 
-          <TextField
+          {/*<TextField
           id="outlined-select-currency"
           select
           label="Section"
           value={props.section}
-          onChange={(e) => props.onSectionChange(e)}
+          onChange={(e) => props.onSectionChang)}
           helperText="Please select the interview section"
           >
           {sections.map((option) => (
@@ -78,10 +78,10 @@ function PopUpForm(props) {
               {option.value}
             </MenuItem>
           ))}
-          </TextField>
+          </TextField>*/}
           
         </Stack>
-        <TextField
+        {<TextField
           id="filled-multiline-static"
           label="Dialog Text"
           value ={props.dialogText}
@@ -93,7 +93,7 @@ function PopUpForm(props) {
         />
       
 
-        
+        /*
         {(props.alternateValues).map((element,index) => (
               <Stack direction='row' >
                 <TextField
@@ -113,7 +113,7 @@ function PopUpForm(props) {
 
       <Box display="flex" justifyContent="flex-end" alignItems="flex-end">
         <Button variant="outlined" onClick={() => addAlternateFields()} startIcon={<AddIcon/>}>Add Alternate</Button>
-      </Box>  
+        </Box>  */}
 
 
       <Stack direction='row'spacing={10}>

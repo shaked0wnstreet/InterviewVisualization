@@ -2,7 +2,7 @@ import './App.css';
 import PopUpForm  from './component/PopUpForm';
 import Button from '@mui/material/Button';
 import { useEffect, useState } from 'react';
-import OverviewFlow from './component/Flow';
+import OverviewFlow from './component/Flow3';
 import json from './GameDev.json'
 import APIService from './APIService';
 //import {InitGraph, InsertNode, RelabelNode, UpdateNode, UpdateGraph, DeleteNode} from './APIService';
@@ -18,11 +18,11 @@ const  App=()=> {
 
     let init_node = {
       id: "000",
-      DialogText: "",
-      data: {label: ""},
+      DialogText: "Hello, nice to meet you?",
+      data: {label: "Hello, nice to meet you?"},
       NextDialogID: "",
       position: {x: 200, y: 50},
-      section: ""
+      section: "Greetings"
     }
     fetch('http://localhost:5000/init', {
     method: 'PUT',
@@ -89,7 +89,7 @@ const  App=()=> {
   return (
     <div className="App">
 
-      {JSON.stringify(interviewerDialogs)}
+      {JSON.stringify(jsonArray)}
       <main style={{ height: 800 }}>
         {/* <h1>React popups</h1>
         <br></br>
