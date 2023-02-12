@@ -16,6 +16,8 @@ import { AssignmentRounded, DeleteOutlineRounded, OndemandVideoTwoTone } from "@
 import { getStepLabelUtilityClass } from "@mui/material";
 import { amber } from "@mui/material/colors";
 import { json } from "d3";
+import BasicModal from "./Modal";
+
 
 let newNodes = {
   "links": [],
@@ -134,6 +136,9 @@ const OverviewFlow = (props) => {
   }*/
   //visualize(props.jsonArray)
   const [nodes, setNodes, onNodesChange] = useNodesState(props.jsonArray["nodes"]);
+
+  /*const onNodesChange =(e)=>{
+  }*/
   const [edges, setEdges, onEdgesChange] = useEdgesState(props.jsonArray["links"]);
 
 
@@ -323,17 +328,24 @@ const OverviewFlow = (props) => {
     [setEdges]
   );*/
 
+  const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), []);
+
   const [position, setPosition] = useState({})
   
   const onPositionChange = (event) => {
     setPosition(event.target.value);
   };
+  const [isDraggable, setIsDraggable] = useState(false);
+  const [isConnectable, setIsConnectable] = useState(false);
+
 
   useEffect(()=>{
 
     let updatedEdges = formatEdges()
     //console.log("updatedEdges", updatedEdges)
     setEdges(updatedEdges)
+
+
 
   }, [edges]);
 /*
@@ -395,20 +407,29 @@ const OverviewFlow = (props) => {
     //visualize(jsonArray)
   }
 */
+  function onDrag(event){
+    console.log(event)
+  }
+  const [errorMessage, setErrorMessage] = useState('')
   //console.log('in Flow component');
   //console.log(JSON.stringify(props.jsonArray['nodes'].length));
   return (
     <>
+    <div style={{"color": 'red'}}>
+      {errorMessage}
+    </div>
       <ReactFlow
         nodes={props.jsonArray['nodes']}
         edges={edges}
         onNodesChange={onNodesChange}
-       // onEdgesChange={onEdgesChange}
+        onEdgesChange={onEdgesChange}
        // onEdgeUpdate={onEdgeUpdate}
-       // onConnect={onConnect}
+        onConnect={onConnect}
         
         onInit={onInit}
         onNodeDoubleClick={onDblClick}
+        //nodesConnectable={isConnectable}
+        nodesDraggable={true}
         //onNodeMouseEnter={handlePopoverOpen}
        //</> onMouseLeave={() => {
           //disable this event (it will be trigger as soon at the popover opens) or use it for autoHide
@@ -416,6 +437,7 @@ const OverviewFlow = (props) => {
        // }}
       fitView
       attributionPosition="top-right"
+      minZoom={0.2}
       >
         <Popover
           id={id}
@@ -474,16 +496,17 @@ const OverviewFlow = (props) => {
             >
               ADD
             </Button>
+            {currentSelectedNode['id']!='000'?
             <Button
               onClick={(event) => {
-               console.log("Delete button clicked");
+                console.log("Delete button clicked");
                // index = nodes.findIndex((node) => node["id"] == anchorEl.getAttribute("data-id"));
+                props.onDelete(currentSelectedNode['id'])
 
-               // DeleteNode(index);
               }}
             >
               DELETE
-            </Button>
+            </Button>:null}
           </div>
             </Popover>
         <MiniMap

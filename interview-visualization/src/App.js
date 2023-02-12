@@ -20,8 +20,9 @@ const  App=()=> {
       id: "000",
       DialogText: "Hello, nice to meet you?",
       data: {label: "Hello, nice to meet you?"},
-      NextDialogID: "",
-      position: {x: 200, y: 50},
+      NextDialogID: {},
+      position: {x: 200, y: 20},
+      type: 'input',
       section: "Greetings"
     }
     fetch('http://localhost:5000/init', {
@@ -85,6 +86,25 @@ const  App=()=> {
     .catch(error => console.log(error));
   }
 
+  function onDelete(nodeID){
+    fetch('http://localhost:5000/delete_node', {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'},
+        body: JSON.stringify({"node_to_delete": nodeID})
+      })
+      .then((response) => response.json())
+      .then((data) => {
+        //this.setState({graph: data});
+        // removes nodeID (DialogueID) from the running list of nodes
+        //this.nodeList.splice(this.nodeList.indexOf(nodeID),1);
+        setJsonArray(data)
+        //@todo: get rid of the next dialog id on the previous node
+        setInterviewerDialogs(data['nodes'])
+      });
+
+  }
+
 
   return (
     <div className="App">
@@ -99,6 +119,7 @@ const  App=()=> {
        <OverviewFlow
         onAddSubmit={onAddSubmit}
         onEditSubmit={onEditSubmit}
+        onDelete = {onDelete}
         jsonArray={jsonArray} 
         questions={interviewerDialogs}
         setInterviewerDialogs={setInterviewerDialogs}
