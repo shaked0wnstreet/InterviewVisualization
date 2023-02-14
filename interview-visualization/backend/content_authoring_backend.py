@@ -46,7 +46,7 @@ def insert_node():
     """if(current_node!=None or current_node!=""):
         out_edges = graph.out_edges(current_node['id']) #returns an array of edges in tuple format. 
         print("out_edges", out_edges)
-        #Checking to see if the current node is not a filter node. 
+         #Checking to see if the current node is not a filter node. 
         if "filterType" not in graph.get_node(current_node['id']).keys():
         
             #Check to see if current node has any outgoing edges 
@@ -105,7 +105,11 @@ def format_d3(data):
                 
                 elif key =='data':
                     formated_data_sample[key]={d[0][0]: d[0][1]}
+                elif key.strip() =='alternates':
+                    print("Here alternates")
+                    formated_data_sample[key]=d
                 else:
+                    
                     formated_data_sample[key] = i["attrs"][key]["data"][0]
                 #if list(i["attrs"][key]["data"][0].keys())!=[]:
                 #    additional_keys = list(i['attrs'][key].keys())
@@ -242,16 +246,20 @@ def remove_edge():
 @app.route("/exists_node", methods=["GET", "PUT", "POST"])
 def exists_node():    
     global graph
-    node_to_check = request.node_to_check["node_to_check"]
+    print("node exists?", request.get_json()['node_to_check'])
+    node_to_check = request.get_json()["node_to_check"]
 
     #this gives us a list of ids 
     all_nodes = list(graph.nodes())
+    print(all_nodes)
 
     #If the node you want to check is in the list of nodes that exist, then return true
     if node_to_check in all_nodes:
-        return True
+        print(True)
+        return "true"
     else:
-        return False 
+        print(False)
+        return "false" 
 
 #@todo: Think about how to allow the user to change the position of a question
 @app.route("/delete_node", methods=["GET", "POST", "PUT"])
@@ -375,7 +383,9 @@ def update_node_attrs():
     global graph
     #This is the full JSON being sent by the client 
     node_to_update = request.get_json()["node_to_update"]
-    print(node_to_update)
+    print("Node to Update", node_to_update)
+    if (node_to_update['alternates']==[]):
+        node_to_update['alternates']=['']
 
     graph.update_node_attrs(node_to_update["id"], node_to_update)
 

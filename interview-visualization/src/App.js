@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react';
 import OverviewFlow from './component/Flow3';
 import json from './GameDev.json'
 import APIService from './APIService';
+import Grid from '@mui/material/Grid';
+ 
 //import {InitGraph, InsertNode, RelabelNode, UpdateNode, UpdateGraph, DeleteNode} from './APIService';
 
 
@@ -19,12 +21,14 @@ const  App=()=> {
     let init_node = {
       id: "000",
       DialogText: "Hello, nice to meet you?",
+      alternates: ['Hi there', "Hello, my name is..."],
       data: {label: "Hello, nice to meet you?"},
-      NextDialogID: {},
-      position: {x: 200, y: 20},
+      NextDialogID: '',
+      position: {x: 200, y: 0},
       type: 'input',
       section: "Greetings"
     }
+   
     fetch('http://localhost:5000/init', {
     method: 'PUT',
     headers: {'Content-Type': 'application/json', 
@@ -39,6 +43,8 @@ const  App=()=> {
       setInterviewerDialogs(data['nodes'])
     })
     .catch(error => console.log(error));
+
+  
 
     
   }, []);
@@ -109,8 +115,8 @@ const  App=()=> {
   return (
     <div className="App">
 
-      {JSON.stringify(jsonArray)}
-      <main style={{ height: 800 }}>
+      {JSON.stringify(jsonArray, 2)}
+      <main style={{ height: window.innerHeight-50}}>
         {/* <h1>React popups</h1>
         <br></br>
         <Button variant="contained" onClick={() => setOnPopUp(true)}>Open PopUp</Button>
@@ -124,7 +130,7 @@ const  App=()=> {
         questions={interviewerDialogs}
         setInterviewerDialogs={setInterviewerDialogs}
       />: "BACKEND NOT CONNECTED"}
-      </main>
+     </main>
     </div>
   );
 }

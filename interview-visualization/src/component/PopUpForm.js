@@ -1,8 +1,9 @@
 import './PopUp.css';
 import { MenuItem, Stack, TextField, Button, Checkbox, FormControlLabel } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import React from "react";
+import React, { useEffect } from "react";
 import Box from '@mui/material/Box';
+import {Alert, AlertTitle} from '@mui/material';
 //import Alternate  from './Alternate';
 
 
@@ -29,6 +30,10 @@ function PopUpForm(props) {
     },
   ];
 
+  const [errorMessage, setErrorMessage] = React.useState("");
+  const [node_exists, setNodeExists] = React.useState(false);
+  const [saveDisabled, setSaveDisabled]  = React.useState(true);
+  
 
   function onSaveBtnClicked() {
     props.setIsModalOpen(!props.isModalOpen);
@@ -49,28 +54,74 @@ function PopUpForm(props) {
   let removeAlternateFields = (i) => {
       let newAlternateValues = [...props.alternateValues];
       newAlternateValues.splice(i, 1);
+      console.log("Alternates", newAlternateValues)
       props.setAlternateValues(newAlternateValues)
+      
+    
   }
+  useEffect(()=>{
+
+    if(node_exists || props.dialogID==''){
+      setSaveDisabled(true)
+    }
+    else{setSaveDisabled(false)}
+
+  }, [saveDisabled, props.dialogID, node_exists]);
+  
+
   return (
     <div className='popup' style={{"padding": "30px"}}>
       <Stack spacing={2} className='popup-inner'>
         
         <Stack direction='row'spacing={5}>
           <TextField
+            required
             id="outlined-required"
             label="Dialog ID"
             value={props.dialogID}
-            disable={false}
-            onChange={(e) => props.onDialogIDChange(e)}
-            placeholder="001"
-          />
+            disabled={props.onEdit}
+            onChange={(e) => {
+              console.log(e.target.value)
+              
+              
+              fetch('http://localhost:5000/exists_node', {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json',
+                  'Access-Control-Allow-Origin': '*'},
+                body: JSON.stringify({"node_to_check": e.target.value})
+              })
+              .then((response) => response.json())
+              .then((data) => {
+                console.log("data", Boolean(data))
+                setNodeExists(Boolean(data))
+              });
+              
+              if(node_exists!=true){
+                props.onDialogIDChange(e);
+                setErrorMessage('')
 
-          {/*<TextField
+              }
+              else{
+                setErrorMessage("ID already exists!")
+                setSaveDisabled(true)
+                
+              }
+            }}
+            placeholder=""
+            
+          /> 
+
+          {node_exists? <Alert severity="error">
+          <AlertTitle>Error</AlertTitle>
+            <strong>{"ID already exists!"}</strong>
+          </Alert>: null}
+
+          <TextField
           id="outlined-select-currency"
           select
           label="Section"
           value={props.section}
-          onChange={(e) => props.onSectionChang)}
+          onChange={(e) => props.onSectionChange(e)}
           helperText="Please select the interview section"
           >
           {sections.map((option) => (
@@ -78,10 +129,10 @@ function PopUpForm(props) {
               {option.value}
             </MenuItem>
           ))}
-          </TextField>*/}
+          </TextField>
           
         </Stack>
-        {<TextField
+        <TextField
           id="filled-multiline-static"
           label="Dialog Text"
           value ={props.dialogText}
@@ -91,11 +142,10 @@ function PopUpForm(props) {
           fullWidth
           placeholder="What challenges did you face?"
         />
-      
-
-        /*
+   
+        
         {(props.alternateValues).map((element,index) => (
-              <Stack direction='row' >
+             <Stack direction='row' >
                 <TextField
                   id="filled-multiline-static"
                   label="Alternate Dialog"
@@ -111,9 +161,9 @@ function PopUpForm(props) {
               </Stack>
         ))}
 
-      <Box display="flex" justifyContent="flex-end" alignItems="flex-end">
+        <Box display="flex" justifyContent="flex-end" alignItems="flex-end">
         <Button variant="outlined" onClick={() => addAlternateFields()} startIcon={<AddIcon/>}>Add Alternate</Button>
-        </Box>  */}
+        </Box>  
 
 
       <Stack direction='row'spacing={10}>
@@ -131,8 +181,11 @@ function PopUpForm(props) {
 
      
         <br></br>
-        <Stack direction='row'spacing={2}>
-          <Button variant="contained" className='save-btn' onClick={onSaveBtnClicked} >Save</Button>
+        <Stack direction='row'
+              spacing={12}
+              alignItems={'center'}
+              justifyContent={"space-between"}>
+          <Button variant="contained" className='save-btn' disabled={saveDisabled} onClick={onSaveBtnClicked} >Save</Button>
           <Button variant="contained" className='cancel-btn' color='error' onClick={() => props.setIsModalOpen(!props.isModalOpen)} >Cancel</Button>       
         </Stack>
         
