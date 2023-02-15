@@ -40,7 +40,7 @@ def insert_node():
     graph.add_nodes_from([(node_to_add['id'], node_to_add)])
     graph.add_edges_from([(current_node['id'], node_to_add['id'])])
     current_node["NextDialogID"]=node_to_add['id']
-    print("updated_node", current_node)
+    #print("updated_node", current_node)
     graph.update_node_attrs(current_node['id'], current_node)
     #Check to see if the current node is empty - if no then proceed. 
     """if(current_node!=None or current_node!=""):
@@ -86,7 +86,7 @@ def format_d3(data):
     #data = data.to_d3_json()
     nodes = data["nodes"]
     links = data["links"]
-    print("INPUT", nodes)
+    #print("INPUT", nodes)
 
     #print("nodes", nodes)
 
@@ -99,6 +99,7 @@ def format_d3(data):
         for key in keys:
             if key!="id":
                 d = i["attrs"][key]["data"]
+                #print("data in format", d)
 
                 if key=='position':
                     formated_data_sample[key]={d[0][0]:d[0][1],d[1][0]:d[1][1]  }
@@ -106,7 +107,7 @@ def format_d3(data):
                 elif key =='data':
                     formated_data_sample[key]={d[0][0]: d[0][1]}
                 elif key.strip() =='alternates':
-                    print("Here alternates")
+                    #print("Here alternates")
                     formated_data_sample[key]=d
                 else:
                     
@@ -115,7 +116,7 @@ def format_d3(data):
                 #    additional_keys = list(i['attrs'][key].keys())
                 #    for k in additional_keys:
                 #        formated_data_sample[key][k] = list(i['attrs'][key]['data'][0]['attrs'][k]["data"][0])
-        print("OUTPUT", formated_data_sample)
+       # print("OUTPUT", formated_data_sample)
         print("************************************8")
         formated_nodes.append(formated_data_sample)
             
@@ -135,7 +136,7 @@ def format_d3(data):
     new_data={}
     new_data['nodes'] = formated_nodes
     new_data['links'] = formatted_links
-    print(new_data)
+   # print(new_data)
         
     return new_data
 
@@ -221,6 +222,7 @@ def create_edge():
     nodes = request.get_json()
     #Get the id of the source node 
     source_node = nodes["source_node"]
+    type = ''
     if "filter" not in graph.get_node(source_node).keys():
         if type=="positive" or type=="negative":
             type= ""
@@ -229,7 +231,7 @@ def create_edge():
 
     target_node = nodes["target_node"]
 
-    graph.add_edges_from([(source_node, target_node, {"type": type})])
+    graph.add_edges_from([(source_node, target_node, {"label": type})])
 
     return format_d3(graph.to_d3_json())
 
@@ -246,7 +248,7 @@ def remove_edge():
 @app.route("/exists_node", methods=["GET", "PUT", "POST"])
 def exists_node():    
     global graph
-    print("node exists?", request.get_json()['node_to_check'])
+    #print("node exists?", request.get_json()['node_to_check'])
     node_to_check = request.get_json()["node_to_check"]
 
     #this gives us a list of ids 
@@ -383,13 +385,29 @@ def update_node_attrs():
     global graph
     #This is the full JSON being sent by the client 
     node_to_update = request.get_json()["node_to_update"]
-    print("Node to Update", node_to_update)
+    #print("Node to Update", node_to_update)
     if (node_to_update['alternates']==[]):
         node_to_update['alternates']=['']
 
     graph.update_node_attrs(node_to_update["id"], node_to_update)
 
     return format_d3(graph.to_d3_json())
+
+#This is for onNodesChange when  the position changes
+@app.route("/on_position_change", methods=["GET", "PUT", "POST"])
+def on_position_change():
+    global graph
+    node_to_update = request.get_json()['node_to_update']
+    #print("UPDATE ALL", node_to_update['id'], node_to_update['position'])
+    
+    updated_node = graph.get_node(node_to_update['id'])
+    #print(updated_node)
+    position = node_to_update['position']
+    #print("Position", position)
+    updated_node['position']= {"x": position['x'], "y": position['y']}
+    graph.update_node_attrs(node_to_update['id'], updated_node)
+    
+    return format_d3(graph.to_d3_json())                                                                                                                                                                                                                                                             
 
 # main driver function
 if __name__ == '__main__':

@@ -2,7 +2,9 @@ import './App.css';
 import PopUpForm  from './component/PopUpForm';
 import Button from '@mui/material/Button';
 import { useEffect, useState } from 'react';
-import OverviewFlow from './component/Flow3';
+//import OverviewFlow from './component/Flow3'; - this is the final one
+import OverviewFlow from './component/Flow';
+
 import json from './GameDev.json'
 import APIService from './APIService';
 import Grid from '@mui/material/Grid';
@@ -110,12 +112,40 @@ const  App=()=> {
       });
 
   }
+  
+  function onEdgeDelete(source, target){
+    fetch('http://localhost:5000/remove_edge', {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'},
+        body: JSON.stringify({"source_node": source, "target_node": target})
+      })
+      .then((response) => response.json())
+      .then((data) => {
+        setJsonArray(data);
+      });
+    }
+
+  function onCreateEdge(source, target, label){
+    fetch('http://localhost:5000/create_edge', {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'},
+        body: JSON.stringify({"source_node": source, "target_node": target, "type": label})
+      })
+      .then((response) => response.json())
+      .then((data) => {
+        setJsonArray(data);
+      });
+  }
+  
+  
 
 
   return (
     <div className="App">
 
-      {JSON.stringify(jsonArray, 2)}
+      {JSON.stringify(jsonArray)}
       <main style={{ height: window.innerHeight-50}}>
         {/* <h1>React popups</h1>
         <br></br>
@@ -126,7 +156,10 @@ const  App=()=> {
         onAddSubmit={onAddSubmit}
         onEditSubmit={onEditSubmit}
         onDelete = {onDelete}
+        onEdgeDelete = {onEdgeDelete}
+        onCreateEdge = {onCreateEdge}
         jsonArray={jsonArray} 
+        setJsonArray={setJsonArray}
         questions={interviewerDialogs}
         setInterviewerDialogs={setInterviewerDialogs}
       />: "BACKEND NOT CONNECTED"}
