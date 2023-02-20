@@ -9,18 +9,19 @@ import ReactFlow, {
   updateEdge,
   applyEdgeChanges,
   applyNodeChanges,
-  ReactFlowProvider
+  ReactFlowProvider,
+  MarkerType
 } from "reactflow";
 import "reactflow/dist/style.css";
 import './PopUp.css';
 import { Button, Popover } from "@material-ui/core";
 import PopUpForm from "./PopUpForm";
 import { AssignmentRounded, DeleteOutlineRounded, OndemandVideoTwoTone } from "@mui/icons-material";
-import { getStepLabelUtilityClass, TextField } from "@mui/material";
+import { getStepLabelUtilityClass, TextField} from "@mui/material";
 import { amber } from "@mui/material/colors";
 import { json } from "d3";
 import BasicModal from "./Modal";
-import HelpIcon from '@mui/icons-material/Help';
+import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 
@@ -65,31 +66,17 @@ const OverviewFlow = (props) => {
     }
   );
 
+  const [xyPos, setxyPos] = useState(false)
   const onNodesChange = useCallback(
-    
-    
     (changes) => setNodes((nds) => 
     {
-      
-      //temporarily removed this for now. 
-    /* if (changes[0].type=='position' && changes[0]['dragging']==true){
-      fetch('http://localhost:5000/on_position_change', {
-        method: 'PUT',
-        headers: {'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'},
-        body: JSON.stringify({"node_to_update": changes[0]})
-      })
-      .then((response) => response.json())
-      .then((data) => {
-        //this.setState({graph: data});
-        props.setJsonArray(data)
-        props.setInterviewerDialogs(data['nodes'])
-  
-      })
-      .catch(error => console.log(error));
-     }*/
-    
-     //console.log(changes)
+     /* if (changes[0].type=='position' && changes[0]['dragging']==true){
+
+          setPosition(changes[0].position)
+        
+      }
+     */
+   // setxyPos(false)
      return applyNodeChanges(changes, nds)
     }),
     [setNodes]
@@ -152,15 +139,12 @@ const OverviewFlow = (props) => {
   };*/
 
   const onNodeClick = (event, node) => {
-    console.log("double click current node", node.id);
+    console.log(" click current node", node.id);
     currentSelectedNode = node;
 
     //setAnchorEl(event.currentTarget);
   }
 
-  const onNodeMouseUp=(event, node)=>{
-    console.log(node.position)
-  }
 
   const handlePopoverClose = () => {
     console.log('handlePopoverClose') 
@@ -200,6 +184,68 @@ const OverviewFlow = (props) => {
     return updatedEdges
 
   }
+  
+  function onNodeDragStop(event, node){
+   /* console.log("position", JSON.stringify({x: event.screenX, y: event.screenY } ))
+    let new_node = node
+    console.log("DragStop", node)
+    new_node['position'] = {x: event.screenX, y: event.screenY}
+    props.onEditSubmit(new_node);*/
+
+    //console.log("On Node Drag Stop", node['position'])
+    //This old position is not the latest positio 
+    setPosition(node['position']);
+    delete node['dragging'];
+    delete node['positionAbsolute'];
+    currentSelectedNode = node;
+    //console.log("Position from ", position)
+    //Only sending an API request when we are done moving the node around.
+    //I don't need the on position change thing anymore
+    setxyPos(true)
+
+    //@todo: Where to put this: it is making things slow- but I do not think it matters
+    /*fetch('http://localhost:5000/update_node_attrs', {
+          method: 'PUT',
+          headers: {'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'},
+          body: JSON.stringify({"node_to_update": node})
+        })
+        .then((response) => response.json())
+        .then((data) => {
+          //this.setState({graph: data});
+          props.setJsonArray(data)
+          props.setInterviewerDialogs(data['nodes'])
+    
+        })
+        .catch(error => console.log(error));
+
+    */
+
+  }
+
+  //Use effect to update the position 
+  useEffect(()=>{
+
+    fetch('http://localhost:5000/update_node_attrs', {
+          method: 'PUT',
+          headers: {'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'},
+          body: JSON.stringify({"node_to_update": currentSelectedNode})
+        })
+        .then((response) => response.json())
+        .then((data) => {
+          //this.setState({graph: data});
+          props.setJsonArray(data)
+          props.setInterviewerDialogs(data['nodes'])
+    
+        })
+        .catch(error => console.log(error));
+      
+    setxyPos(false);   
+  
+  }, [xyPos]);
+
+  
 
   function onSubmitBtn() {
 
@@ -252,7 +298,7 @@ const OverviewFlow = (props) => {
   // combine the new infomation from the state container and pass it to 
   function createEditNodeObj(currentNode) {
     console.log("currentNode", currentNode)
-    console.log("alternames", currentNode['alternates'])
+    //console.log("alternames", currentNode['alternates'])
 
     let newNode = {
       "id": dialogID,
@@ -297,13 +343,16 @@ const OverviewFlow = (props) => {
   
  useEffect(()=>{
 
-    let updatedEdges = formatEdges()
-    //console.log("updatedEdges", updatedEdges)
-    setEdges(updatedEdges)
-    setNodes(props.jsonArray['nodes'])
     
-
-  }, [edges, nodes, props.jsonArray]);
+      let updatedEdges = formatEdges()
+      //console.log("updatedEdges", updatedEdges)
+      setEdges(updatedEdges)
+      setNodes(props.jsonArray['nodes'])
+    
+  }, [props.jsonArray]); // putting things here triggers */
+  //userEffect on any change to any of these
+  //I understand how useEffect works now 
+  
 
   function downloadTxtFile () {
     const element = document.createElement("a");
@@ -339,11 +388,14 @@ const OverviewFlow = (props) => {
     },
   };*/
 
-  const [editLabel, setEditLabel] = useState(false);
+  function onEdgeClick(event, edge){
+    console.log("Current edge", edge)
+    currentSelectedEdge=edge
+  }
+  //const [editTextFieldAnchorEl, setEditTextFieldAnchorEl] = React.useState(null);
+  const [editLabel, setEditLabel] = useState(false)
  
-  //const [errorMessage, setErrorMessage] = useState('')
-  //console.log('in Flow component');
-  //console.log(JSON.stringify(props.jsonArray['nodes'].length));*/
+
 
   //************************************************************ */
 
@@ -359,7 +411,7 @@ const OverviewFlow = (props) => {
       Download 
   </Button>*/}
 
-      <div>{JSON.stringify(currentSelectedNode['position'])}</div>
+      {/*<div>{JSON.stringify(currentSelectedNode['position'])}</div>*/}
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -371,6 +423,8 @@ const OverviewFlow = (props) => {
         //defaultEdgeOptions={defaultEdgeOptions}
         onNodeContextMenu={onContextMenu}
         onEdgeContextMenu={onEdgeContextMenu}
+        onEdgeClick={onEdgeClick}
+        onNodeDragStop={onNodeDragStop}
         //onConnectEnd= {onConnectEnd}
         fitView
         attributionPosition="top-right"
@@ -415,7 +469,9 @@ const OverviewFlow = (props) => {
                 
                 setAnchorEl(false);
                 setIsModalOpen(true);
-                
+
+                let updatedEdges = formatEdges()
+   
 
               }}
             >
@@ -457,7 +513,7 @@ const OverviewFlow = (props) => {
           id={id}
           open={openEdgeMenu}
           anchorEl={edgeAnchorEl}
-          onClose={handlePopoverClose}
+          onClose={()=>{setEdgeAnchorEl(null)}}
 
           anchorOrigin={{
             vertical: "bottom",
@@ -557,8 +613,9 @@ const OverviewFlow = (props) => {
       <Popover 
       open={editLabel}
       anchorEl={edgeAnchorEl}
+      onClose={()=>{setEditLabel(false)}}
       anchorOrigin={{
-        vertical: "bottom",
+        vertical: "center",
         horizontal: "center"
       }}
       transformOrigin={{
@@ -567,29 +624,44 @@ const OverviewFlow = (props) => {
       }}
       disableRestoreFocus={true}
       >
+      <div style={{padding: "10px"}}>
       <TextField
       variant="outlined"
       label="Edge Condition"
       placeholder="Type edge condition here"
+      helperText="Press Enter to save"
+      
+      value={currentSelectedEdge['type']}
       onKeyDown={(e)=>{
         console.log(e.code)
         if (e.code=="Enter"){
-          setEdgeAnchorEl(false);
+          setEdgeAnchorEl(null);
           setEditLabel(false)
+          //currentSelectedEdge['label'] = 
 
           //editLabel=false;
 
+          props.onEdgeUpdate(currentSelectedEdge)
+          currentSelectedEdge=''
+          
+
         }
       }}
-      value={currentSelectedEdge['type']}
       onChange={(event)=>{
         console.log("edge condition", event.target.value)
         currentSelectedEdge['type'] = event.target.value
-        console.log(currentSelectedEdge)
+        currentSelectedEdge['label'] = event.target.value;
+        
+        
+
+
+        //console.log("CurrentcurrentSelectedEdge)
 
         
       }}> </TextField> 
-      <HelpIcon />
+      <HelpOutlineOutlinedIcon />
+
+      </div>
       
       </Popover>
     </>

@@ -144,7 +144,7 @@ def format_d3(data):
 #Inserting yes or no type of questions to the current node 
 #this is when the user wants to convert the current question to a yes/no type.
 #so instead of next dialogue ID, the JSON can have next_positive and next_negative. 
-@app.route("/insert_yes_no", methods=["GET", "POST", "PUT"])
+"""@app.route("/insert_yes_no", methods=["GET", "POST", "PUT"])
 def insert_yes_no():
     global graph
     #current node after which we want to add the dangling yes/no type of question
@@ -194,7 +194,7 @@ def insert_yes_no():
                                  ("no_dialogue", next_node)])
 
     return format_d3(graph.to_d3_json())
-
+"""
 
 @app.route("/relabel_node", methods=["GET", "POST", "PUT"])
 def relabel_node():
@@ -235,7 +235,18 @@ def create_edge():
 
     return format_d3(graph.to_d3_json())
 
-    
+
+#Update edge
+@app.route("/update_edge", methods=["GET", "POST", "PUT"])
+def update_edge():
+
+    global graph
+    edge = request.get_json()['edge_to_update']
+    graph.update_edge_attrs(edge['source'], edge['target'], edge)
+
+
+    return format_d3(graph.to_d3_json())
+
 @app.route("/remove_edge", methods=["GET", "PUT", "POST"])
 def remove_edge():
 

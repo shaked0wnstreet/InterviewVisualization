@@ -14,7 +14,7 @@ import Grid from '@mui/material/Grid';
 
 const  App=()=> {
   // const [onPopUp, setOnPopUp] = useState(false); 
-  const [jsonArray, setJsonArray] = useState('')
+  const [jsonArray, setJsonArray] = useState({'nodes': [], 'links': []})
   const [interviewerDialogs, setInterviewerDialogs] = useState('');
 
 
@@ -139,13 +139,27 @@ const  App=()=> {
       });
   }
   
+  function onEdgeUpdate(edge){
+    console.log("Edge to Update", edge)
+    fetch('http://localhost:5000/update_edge', {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'},
+        body: JSON.stringify({"edge_to_update": edge})
+      })
+      .then((response) => response.json())
+      .then((data) => {
+        setJsonArray(data);
+      });
+  }
   
 
 
   return (
     <div className="App">
 
-      {JSON.stringify(jsonArray)}
+      {/*JSON.stringify(jsonArray['nodes'].map((nds)=>  {return nds['position']}))*/}
+      {JSON.stringify(jsonArray['links'])}
       <main style={{ height: window.innerHeight-50}}>
         {/* <h1>React popups</h1>
         <br></br>
@@ -158,6 +172,7 @@ const  App=()=> {
         onDelete = {onDelete}
         onEdgeDelete = {onEdgeDelete}
         onCreateEdge = {onCreateEdge}
+        onEdgeUpdate = {onEdgeUpdate}
         jsonArray={jsonArray} 
         setJsonArray={setJsonArray}
         questions={interviewerDialogs}
