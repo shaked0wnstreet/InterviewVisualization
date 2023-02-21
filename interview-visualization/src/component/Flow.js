@@ -17,11 +17,13 @@ import './PopUp.css';
 import { Button, Popover } from "@material-ui/core";
 import PopUpForm from "./PopUpForm";
 import { AssignmentRounded, DeleteOutlineRounded, OndemandVideoTwoTone } from "@mui/icons-material";
-import { getStepLabelUtilityClass, TextField} from "@mui/material";
+import { getStepLabelUtilityClass, Grid, Item, TextField} from "@mui/material";
 import { amber } from "@mui/material/colors";
 import { json } from "d3";
 import BasicModal from "./Modal";
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
+import Tooltip from '@mui/material/Tooltip';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 
@@ -55,7 +57,7 @@ const OverviewFlow = (props) => {
     (params) => setEdges((eds) => {
       console.log("onConnect", params)
 
-      props.onCreateEdge(params['source'], params['target'], '')
+      props.onCreateEdge(params['source']+"-"+ params['target'], params['source'], params['target'], '')
 
       return addEdge(params, eds)}), [setEdges]
    
@@ -86,7 +88,7 @@ const OverviewFlow = (props) => {
   );
   const onEdgesChange = useCallback(
     (changes) => setEdges((eds) => {
-    console.log("Edges", changes)
+    //console.log("Edges", changes)
     return applyEdgeChanges(changes, eds)
     }),
     [setEdges]
@@ -139,6 +141,7 @@ const OverviewFlow = (props) => {
   };*/
 
   const onNodeClick = (event, node) => {
+    event.preventDefault()
     console.log(" click current node", node.id);
     currentSelectedNode = node;
 
@@ -164,6 +167,7 @@ const OverviewFlow = (props) => {
     currentSelectedNode=node;
     //console.log(event, node)
     //setOpen(true)
+    setTooltipAnchorEl(null);
     setAnchorEl(event.currentTarget)
   }
   function formatEdges()
@@ -176,6 +180,7 @@ const OverviewFlow = (props) => {
         type: "arrowclosed",
         strokeWidth: 5
       }
+      link['id'] = link['source']+"_"+ link['target']
       updatedEdges.push(link)
       //console.log("Link", link)
     }
@@ -184,6 +189,8 @@ const OverviewFlow = (props) => {
     return updatedEdges
 
   }
+
+  /********************CHANGING POSITION OF NODE********************************************************** */
   
   function onNodeDragStop(event, node){
    /* console.log("position", JSON.stringify({x: event.screenX, y: event.screenY } ))
@@ -202,26 +209,22 @@ const OverviewFlow = (props) => {
     //Only sending an API request when we are done moving the node around.
     //I don't need the on position change thing anymore
     setxyPos(true)
-
-    //@todo: Where to put this: it is making things slow- but I do not think it matters
-    /*fetch('http://localhost:5000/update_node_attrs', {
-          method: 'PUT',
-          headers: {'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'},
-          body: JSON.stringify({"node_to_update": node})
-        })
-        .then((response) => response.json())
-        .then((data) => {
-          //this.setState({graph: data});
-          props.setJsonArray(data)
-          props.setInterviewerDialogs(data['nodes'])
-    
-        })
-        .catch(error => console.log(error));
-
-    */
-
   }
+
+  function onNodeMouseEnter(event, node){
+    event.preventDefault();
+    console.log("on Node Hover")
+    setTooltipAnchorEl(event.currentTarget)
+    
+  }
+
+  function onNodeMouseLeave(event, node){
+    event.preventDefault()
+    console.log("on Node Hover Leave")
+    setTooltipAnchorEl(false)
+  }
+
+
 
   //Use effect to update the position 
   useEffect(()=>{
@@ -245,7 +248,12 @@ const OverviewFlow = (props) => {
   
   }, [xyPos]);
 
-  
+  const [position, setPosition] = useState({}) //position note really used
+  const onPositionChange = (event) => {
+    setPosition(event.target.value);
+  };
+
+  /*******************************************SUBMISSION*********************************************** */
 
   function onSubmitBtn() {
 
@@ -294,7 +302,6 @@ const OverviewFlow = (props) => {
   }
 
   
-
   // combine the new infomation from the state container and pass it to 
   function createEditNodeObj(currentNode) {
     console.log("currentNode", currentNode)
@@ -333,14 +340,8 @@ const OverviewFlow = (props) => {
     return newNode;
   }
 
-  const [position, setPosition] = useState({})
-  const onPositionChange = (event) => {
-    setPosition(event.target.value);
-  };
-  //const [isDraggable, setIsDraggable] = useState(false);
-  //const [isConnectable, setIsConnectable] = useState(false);
 
-  
+/*********************************************UPDATING NODES AND EDGES**********************************/
  useEffect(()=>{
 
     
@@ -354,6 +355,8 @@ const OverviewFlow = (props) => {
   //I understand how useEffect works now 
   
 
+/*******************************************DOOWNLOADING FILE******************************************/
+
   function downloadTxtFile () {
     const element = document.createElement("a");
     const file = new Blob([JSON.stringify(props.jsonArray, null, 2)], {type: 'application/json'});
@@ -364,10 +367,13 @@ const OverviewFlow = (props) => {
   }
 
 
-  //************************Edge functions********************************** */
+  //*****************************************EDGE FUNCTIONS********************************** */
 
   const [edgeAnchorEl, setEdgeAnchorEl] = React.useState(null);
   const openEdgeMenu = Boolean(edgeAnchorEl)
+  
+  const [tooltipAnchorEl, setTooltipAnchorEl] = React.useState(null);
+  const tooltipOpen = Boolean(tooltipAnchorEl)
  
   function onEdgeContextMenu(event, edge){
     event.preventDefault() 
@@ -375,7 +381,9 @@ const OverviewFlow = (props) => {
     currentSelectedEdge['type']==''
     //console.log(event.currentTarget)
     console.log("edge", edge)
+    setTooltipAnchorEl(null)
     setEdgeAnchorEl(event.currentTarget)
+
   }
  
   /*const defaultEdgeOptions = {
@@ -389,6 +397,7 @@ const OverviewFlow = (props) => {
   };*/
 
   function onEdgeClick(event, edge){
+    event.preventDefault()
     console.log("Current edge", edge)
     currentSelectedEdge=edge
   }
@@ -397,19 +406,35 @@ const OverviewFlow = (props) => {
  
 
 
-  //************************************************************ */
+  //***********************************RENDERING*******************************************/
 
   return (
     <>
+
+    <Grid container spacing={2} 
+    alignItems={"center"}>
+      
+      <Grid item xs={2} md={2}>
+        <ArrowBackIcon/> Back
+      </Grid>
+      <Grid item xs={8} md={8}>
+          <Button 
+            zIndex={2}
+            fontSize="small"
+            startIcon={<FileDownloadIcon/>}
+            onClick={downloadTxtFile}> 
+            Download 
+          </Button>
+      </Grid>
+      <Grid item xs={2} md={2}>
+        <Tooltip fontSize="100" title="Right click on Nodes and Edges for options" >
+              <HelpOutlineOutlinedIcon size="large"/>
+
+        </Tooltip>      
+        </Grid>
+    </Grid>
     
-      {/*<Button 
-      style={{zIndex: 2}}
-      variant="contained" 
-      color= "primary"
-      startIcon={<FileDownloadIcon/>}
-      onClick={downloadTxtFile}> 
-      Download 
-  </Button>*/}
+ 
 
       {/*<div>{JSON.stringify(currentSelectedNode['position'])}</div>*/}
       <ReactFlow
@@ -425,12 +450,12 @@ const OverviewFlow = (props) => {
         onEdgeContextMenu={onEdgeContextMenu}
         onEdgeClick={onEdgeClick}
         onNodeDragStop={onNodeDragStop}
+        //onNodeMouseEnter={onNodeMouseEnter}
+        //onNodeMouseLeave={onNodeMouseLeave}
         //onConnectEnd= {onConnectEnd}
         fitView
         attributionPosition="top-right"
         minZoom={0.5}
-        
-
       >
        
        <Popover
@@ -466,7 +491,6 @@ const OverviewFlow = (props) => {
                 setSection(currentSelectedNode['section'])
                 setOnAdd(false);
                 setAlternateValues(currentSelectedNode['alternates'])
-                
                 setAnchorEl(false);
                 setIsModalOpen(true);
 
@@ -663,6 +687,24 @@ const OverviewFlow = (props) => {
 
       </div>
       
+      </Popover>
+      <Popover
+      open={tooltipOpen}
+      anchorEl={tooltipAnchorEl}
+      onClose={onNodeMouseLeave}
+      anchorOrigin={{
+        vertical: "bottom",
+        horizontal: "center"
+      }}
+      transformOrigin={{
+        vertical: "top",
+        horizontal: "center"
+      }}
+      disableRestoreFocus={true}>
+
+        Right click for options to EDIT.
+
+
       </Popover>
     </>
   );

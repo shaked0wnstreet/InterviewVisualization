@@ -126,12 +126,14 @@ const  App=()=> {
       });
     }
 
-  function onCreateEdge(source, target, label){
+  function onCreateEdge(id, source, target, label){
+    console.log("id", id)
+
     fetch('http://localhost:5000/create_edge', {
         method: 'PUT',
         headers: {'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*'},
-        body: JSON.stringify({"source_node": source, "target_node": target, "type": label})
+        body: JSON.stringify({"source_node": source, "target_node": target, "type": label, "id": id})
       })
       .then((response) => response.json())
       .then((data) => {
