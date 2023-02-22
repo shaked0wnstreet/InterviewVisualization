@@ -1,13 +1,22 @@
 import './App.css';
 import PopUpForm  from './component/PopUpForm';
 import Button from '@mui/material/Button';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 //import OverviewFlow from './component/Flow3'; - this is the final one
 import OverviewFlow from './component/Flow';
 
 import json from './GameDev.json'
 import APIService from './APIService';
 import Grid from '@mui/material/Grid';
+import Alert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+import { LocalConvenienceStoreOutlined } from '@mui/icons-material';
+
+
+
+
  
 //import {InitGraph, InsertNode, RelabelNode, UpdateNode, UpdateGraph, DeleteNode} from './APIService';
 
@@ -16,6 +25,7 @@ const  App=()=> {
   // const [onPopUp, setOnPopUp] = useState(false); 
   const [jsonArray, setJsonArray] = useState({'nodes': [], 'links': []})
   const [interviewerDialogs, setInterviewerDialogs] = useState('');
+  const [errorMessage, setErrorMessage] = useState('')
 
 
   useEffect(() => {
@@ -25,12 +35,13 @@ const  App=()=> {
       DialogText: "Hello, nice to meet you?",
       alternates: ['Hi there', "Hello, my name is..."],
       data: {label: "Hello, nice to meet you?"},
-      NextDialogID: '',
+      NextDialogID: [""],
       position: {x: 200, y: 0},
       type: 'input',
       section: "Greetings"
     }
    
+   // console.log("init_node", init_node)
     fetch('http://localhost:5000/init', {
     method: 'PUT',
     headers: {'Content-Type': 'application/json', 
@@ -77,7 +88,7 @@ const  App=()=> {
   function onEditSubmit(newNode) {
     // call the API to UpdateNode(newNode)
     //setJsonArray(UpdateNode(newNode));
-    console.log("OnEditSubmit", JSON.stringify(newNode))
+   // console.log("OnEditSubmit", JSON.stringify(newNode))
     fetch('http://localhost:5000/update_node_attrs', {
       method: 'PUT',
       headers: {'Content-Type': 'application/json',
@@ -127,7 +138,7 @@ const  App=()=> {
     }
 
   function onCreateEdge(id, source, target, label){
-    console.log("id", id)
+    //console.log("id", id)
 
     fetch('http://localhost:5000/create_edge', {
         method: 'PUT',
@@ -137,7 +148,16 @@ const  App=()=> {
       })
       .then((response) => response.json())
       .then((data) => {
-        setJsonArray(data);
+
+        if (data==true){
+          setErrorMessage("Error! Connection already exists!")
+          setOpenSnackBar(true)
+
+        }
+        else{
+          setJsonArray(data);
+
+        }
       });
   }
   
@@ -154,14 +174,62 @@ const  App=()=> {
         setJsonArray(data);
       });
   }
+
+  const [openSnackBar, setOpenSnackBar] = React.useState(false);
+
+
+
+  const handleClose = (event, reason) => {
+    console.log("Snackbar event", event)
+    console.log("Snackbar reason", reason)
+    
   
+    if (reason == 'clickaway') {
+      setOpenSnackBar(false);
+      setErrorMessage('')
+      
+      return;
+    }
+    
+    setOpenSnackBar(false);
+    setErrorMessage('')
+
+  };
+
 
 
   return (
     <div className="App">
+      <Snackbar
+        open={openSnackBar}
+        anchorOrigin={{ vertical: 'top', horizontal: "center" }}
+        style={{width: '100%'}}
+        autoHideDuration={6000}
+        onClose={handleClose}
+        message="Note archived"
+        //action={action}
+      >
+      <Alert style={{width: "80%", border: 'red solid 2px', padding:'5px'}} severity="error"  
+       action={
+        <IconButton
+          aria-label="close"
+          color="inherit"
+          size="medium"
+          onClick={() => {
+            setOpenSnackBar(false);
+            setErrorMessage('');
+          }}
+        >
+          <CloseIcon fontSize="inherit" />
+        </IconButton>
+      }
+      >
+        {errorMessage}</Alert>
+      </Snackbar>
 
-      {/*JSON.stringify(jsonArray['nodes'].map((nds)=>  {return nds['position']}))*/}
-      {JSON.stringify(jsonArray['links'])}
+
+      {/*JSON.stringify(jsonArray['nodes'])*/}
+      {/*JSON.stringify(jsonArray['links'])*/}
       <main style={{ height: window.innerHeight-50}}>
         {/* <h1>React popups</h1>
         <br></br>
@@ -179,6 +247,8 @@ const  App=()=> {
         setJsonArray={setJsonArray}
         questions={interviewerDialogs}
         setInterviewerDialogs={setInterviewerDialogs}
+        setErrorMessage ={setErrorMessage}
+        setOpenSnackBar= {setOpenSnackBar}
       />: "BACKEND NOT CONNECTED"}
      </main>
     </div>

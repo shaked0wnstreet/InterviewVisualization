@@ -1,5 +1,5 @@
 import './PopUp.css';
-import { MenuItem, Stack, TextField, Button, Checkbox, FormControlLabel } from '@mui/material';
+import { MenuItem, Stack, TextField, Divider, Button, Checkbox, FormControlLabel } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import React, { useEffect } from "react";
 import Box from '@mui/material/Box';
@@ -147,6 +147,7 @@ function PopUpForm(props) {
         {(props.alternateValues).map((element,index) => (
              <Stack direction='row' >
                 <TextField
+                  key={index}
                   id="filled-multiline-static"
                   label="Alternate Dialog"
                   name="alternate"
@@ -166,18 +167,30 @@ function PopUpForm(props) {
         </Box>  
 
 
-      <Stack direction='row'spacing={10}>
-        <TextField //this one should have multiple children
-          id="outlined-required"
-          label="Next Dialog ID"
-          onChange={(e) =>props.onNextDialogIDChange(e)}
-          value={props.nextID}
-          required = {props.responseType === 'Statements'}
-          disabled = {!props.requiredResponse || props.responseType === 'Positive/Negative'}
-          placeholder="Enter next ID or connect this node to a new node"
-        />
+      <Box display="flex" justifyContent="flex-start" alignItems="flex-start">
+        {(props.nextID).map((element,index) => (
+          
+        <Stack direction='column'
+        divider={<Divider orientation="vertical" flexItem />}
 
-      </Stack>
+        spacing={3}>
+          <TextField //this one should have multiple children
+            id="outlined-required"
+            key={index}
+            label={"Child "+ (parseInt(index)+1).toString()}
+            size='small'
+            //onChange={(e) =>props.onNextDialogIDChange(e)}
+            //value={props.nextID}
+            defaultValue={element} 
+            //required = {props.responseType === 'Statements'}
+           // disabled = {!props.requiredResponse || props.responseType === 'Positive/Negative'}
+           disabled={true} 
+           //placeholder="Enter next ID or connect this node to a new node"
+          />
+
+          </Stack>
+        ))}
+      </Box>
 
      
         <br></br>

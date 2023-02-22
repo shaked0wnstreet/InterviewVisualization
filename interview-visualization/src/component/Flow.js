@@ -16,9 +16,7 @@ import "reactflow/dist/style.css";
 import './PopUp.css';
 import { Button, Popover } from "@material-ui/core";
 import PopUpForm from "./PopUpForm";
-import { AssignmentRounded, DeleteOutlineRounded, OndemandVideoTwoTone } from "@mui/icons-material";
-import { getStepLabelUtilityClass, Grid, Item, TextField} from "@mui/material";
-import { amber } from "@mui/material/colors";
+import { Grid, Item, TextField} from "@mui/material";
 import { json } from "d3";
 import BasicModal from "./Modal";
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
@@ -27,10 +25,14 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 
+
+
 import TextUpdaterNode from './TextUpdaterNode.js';
 
 import './text-updater-node.css';
-import PopUpForm2 from "./PopUpForm2";
+import './reactflow.css';
+
+
 
 let newNodes = {
   "links": [],
@@ -40,6 +42,8 @@ let newNodes = {
 let currentSelectedNode = {}
 let currentSelectedEdge = {}
 
+
+
 //let aNode = {};
 //let index = -1;
 //let nodeID = -1; 
@@ -47,8 +51,8 @@ let currentSelectedEdge = {}
 
 
 const OverviewFlow = (props) => {
-  
 
+  
   const [nodes, setNodes] = useNodesState(props.jsonArray["nodes"]);
 
   const [edges, setEdges] = useEdgesState(props.jsonArray["links"]);
@@ -57,6 +61,25 @@ const OverviewFlow = (props) => {
     (params) => setEdges((eds) => {
       console.log("onConnect", params)
 
+      /*console.log("Checking if edge exixts")
+        fetch('http://localhost:5000/exists_edge', {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*'},
+            body: JSON.stringify({"source":params['source'], "target": params['target']})
+          })
+          .then((response) => response.json())
+          .then((data) => {
+            //setJsonArray(data);
+            console.log("Edge exists", data)
+            if (data==false){
+              console.log("Creating edge")
+
+            }
+          });
+          props.onCreateEdge(params['source']+"-"+ params['target'], params['source'], params['target'], '')
+
+      */
       props.onCreateEdge(params['source']+"-"+ params['target'], params['source'], params['target'], '')
 
       return addEdge(params, eds)}), [setEdges]
@@ -78,6 +101,10 @@ const OverviewFlow = (props) => {
         
       }
      */
+        //console.log("changes node", changes)
+        if (changes[0]["selected"]==true){
+          console.log("selected: "+ changes[0]['id'])
+        }
    // setxyPos(false)
      return applyNodeChanges(changes, nds)
     }),
@@ -86,6 +113,8 @@ const OverviewFlow = (props) => {
     //#todo: Update the position of the node in the JSON array backend
   
   );
+
+
   const onEdgesChange = useCallback(
     (changes) => setEdges((eds) => {
     //console.log("Edges", changes)
@@ -115,9 +144,9 @@ const OverviewFlow = (props) => {
     setSection(event.target.value);
   };
 
-  const [nextID, setNextID] = useState('');
+  const [nextID, setNextID] = useState(['']);
   const onNextDialogIDChange = (event) => {
-    setNextID(event.target.value);
+    //setNextID(event.target.value);
   };
 
 
@@ -144,6 +173,7 @@ const OverviewFlow = (props) => {
     event.preventDefault()
     console.log(" click current node", node.id);
     currentSelectedNode = node;
+
 
     //setAnchorEl(event.currentTarget);
   }
@@ -173,18 +203,19 @@ const OverviewFlow = (props) => {
   function formatEdges()
   {
     let updatedEdges = []
-    for(var i=0; i<props.jsonArray["links"].length;i++){
-      let link = props.jsonArray["links"][i]
-      link ['labelStyle']=  { fontSize: 12 },
-      link['markerEnd']= {
-        type: "arrowclosed",
-        strokeWidth: 5
+      for(var i=0; i<props.jsonArray["links"].length;i++){
+        let link = props.jsonArray["links"][i]
+        link ['labelStyle']=  { fontSize: 12 },
+        link['markerEnd']= {
+          type: "arrowclosed",
+          strokeWidth: 5
+        }
+        link['id'] = link['source']+"_"+ link['target']
+        updatedEdges.push(link)
+        //console.log("Link", link)
       }
-      link['id'] = link['source']+"_"+ link['target']
-      updatedEdges.push(link)
-      //console.log("Link", link)
-    }
-    //console.log("updateedges", updatedEdges)
+      //console.log("updateedges", updatedEdges)
+  
 
     return updatedEdges
 
@@ -267,7 +298,7 @@ const OverviewFlow = (props) => {
       setDialogText('');
       setDialogID('');
       setSection('');
-      setNextID('');
+      setNextID(['']);
       setAlternateValues(['']);
       setPosition({})
       setLabel({'label': ''})
@@ -282,7 +313,7 @@ const OverviewFlow = (props) => {
       setDialogText('');
       setDialogID('');
       setSection('');
-      setNextID('');
+      setNextID(['']);
       setAlternateValues(['']);
       setPosition({})
       setLabel({'label': ''})
@@ -345,9 +376,13 @@ const OverviewFlow = (props) => {
  useEffect(()=>{
 
     
+      //console.log("updating edges now", props.jsonArray)
+
       let updatedEdges = formatEdges()
       //console.log("updatedEdges", updatedEdges)
       setEdges(updatedEdges)
+    
+      
       setNodes(props.jsonArray['nodes'])
     
   }, [props.jsonArray]); // putting things here triggers */
@@ -401,6 +436,34 @@ const OverviewFlow = (props) => {
     console.log("Current edge", edge)
     currentSelectedEdge=edge
   }
+
+  const deleteFunction = useCallback((event) => {
+    if (event.key === "Delete") {
+      //Do whatever when esc is pressed
+      if(currentSelectedEdge!={}){
+        props.onEdgeDelete(currentSelectedEdge.source, currentSelectedEdge.target)
+        currentSelectedEdge={}
+      }
+      if (currentSelectedNode['id']=='000'){
+        props.setErrorMessage("Cannot delete root node!")
+        props.setOpenSnackBar(true);
+      }
+      
+      if (currentSelectedNode!={} && currentSelectedNode['id']!='000'){
+        props.onDelete(currentSelectedNode['id'])
+        currentSelectedNode={}
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener("keydown", deleteFunction, false);
+
+    return () => {
+      document.removeEventListener("keydown", deleteFunction, false);
+    };
+  }, [deleteFunction]);
+
   //const [editTextFieldAnchorEl, setEditTextFieldAnchorEl] = React.useState(null);
   const [editLabel, setEditLabel] = useState(false)
  
@@ -419,7 +482,6 @@ const OverviewFlow = (props) => {
       </Grid>
       <Grid item xs={8} md={8}>
           <Button 
-            zIndex={2}
             fontSize="small"
             startIcon={<FileDownloadIcon/>}
             onClick={downloadTxtFile}> 
@@ -487,14 +549,14 @@ const OverviewFlow = (props) => {
                 setOnEdit(true);
                 setDialogID(currentSelectedNode['id'])
                 setDialogText(currentSelectedNode['DialogText'])
-                setNextID()
+                setNextID(currentSelectedNode['NextDialogID'])
                 setSection(currentSelectedNode['section'])
                 setOnAdd(false);
                 setAlternateValues(currentSelectedNode['alternates'])
                 setAnchorEl(false);
                 setIsModalOpen(true);
 
-                let updatedEdges = formatEdges()
+                //let updatedEdges = formatEdges()
    
 
               }}
@@ -508,7 +570,7 @@ const OverviewFlow = (props) => {
                 setOnAdd(true);
                 setDialogID('')
                 setDialogText('')
-                setNextID('')
+                setNextID([''])
                 setSection('')
                 setAlternateValues([''])
                 setAnchorEl(false);
@@ -524,6 +586,8 @@ const OverviewFlow = (props) => {
                 onClick={(event) => {
                   console.log("Delete button clicked");
                   setAnchorEl(false);
+                  props.onDelete(currentSelectedNode['id'])
+                  currentSelectedNode={}
                   
 
 
@@ -556,29 +620,40 @@ const OverviewFlow = (props) => {
               // timeoutId = setTimeout(handlePopoverClose, 1000);
             }}
           >
-             <Button
-                onClick={(event) => {
-                  console.log("ADD LABEL button clicked");
-                  setEdgeAnchorEl(null);
-                  setEditLabel(true);
+             {currentSelectedEdge['type']==null? 
+              <Button
+                  onClick={(event) => {
+                    console.log("ADD LABEL button clicked");
+                    setEdgeAnchorEl(null);
+                    setEditLabel(true);
+                  }
+                  }
+                  color={"default"}
 
-                  
-                 // props.onEdgeDelete(currentSelectedEdge['source'], currentSelectedEdge['target']);
-                  //let updatedEdges = formatEdges()
-                  //setEdges(updatedEdges)
-                }
-                }
-                color={"default"}
+                >
+                  ADD EDGE CONDITION
+                </Button>
+                :
+                <Button
+                    onClick={(event) => {
+                      console.log("EDIT LABEL button clicked");
+                      setEdgeAnchorEl(null);
+                      setEditLabel(true);
+                    }
+                    }
+                    color={"default"}
 
-              >
-                ADD LABEL
+                  >
+                EDIT EDGE CONDITION
               </Button>
+              }
               <Button
                 onClick={(event) => {
                   console.log("Delete button clicked");
                   setEdgeAnchorEl(false);
                   props.onEdgeDelete(currentSelectedEdge['source'], currentSelectedEdge['target']);
                   //let updatedEdges = formatEdges()
+                  currentSelectedEdge={}
                   //setEdges(updatedEdges)
                 }
                 }
@@ -655,7 +730,7 @@ const OverviewFlow = (props) => {
       placeholder="Type edge condition here"
       helperText="Press Enter to save"
       
-      value={currentSelectedEdge['type']}
+      defaultValue={currentSelectedEdge!={}?currentSelectedEdge['type']: ''}
       onKeyDown={(e)=>{
         console.log(e.code)
         if (e.code=="Enter"){
@@ -676,19 +751,13 @@ const OverviewFlow = (props) => {
         currentSelectedEdge['type'] = event.target.value
         currentSelectedEdge['label'] = event.target.value;
         
-        
-
-
-        //console.log("CurrentcurrentSelectedEdge)
-
-        
       }}> </TextField> 
       <HelpOutlineOutlinedIcon />
 
       </div>
       
       </Popover>
-      <Popover
+      {/*<Popover
       open={tooltipOpen}
       anchorEl={tooltipAnchorEl}
       onClose={onNodeMouseLeave}
@@ -705,7 +774,7 @@ const OverviewFlow = (props) => {
         Right click for options to EDIT.
 
 
-      </Popover>
+    </Popover>*/}
     </>
   );
 };

@@ -16,8 +16,9 @@ def init():
     graph = NXGraph()
     #Getting the init_node from the client 
     dialogue = request.get_json()["init_node"]
+    print("Init next ID", dialogue['NextDialogID'])
     graph.add_nodes_from([(dialogue["id"], dialogue)])
-
+    print(format_d3(graph.to_d3_json()))
     return format_d3(graph.to_d3_json())
 
 #When the last node is dangling, then you go on to add a node at the end of the graph
@@ -29,56 +30,28 @@ def insert_node():
     #Getting the message from the client. 
     dialogues = request.get_json()
     #print("dialogues", dialogues)
+
     
     #get the name of the current node after which you want to add a new question
     current_node = dialogues["current_node"]
-    
+    print("current node Next id", current_node)
     #get the dialogue object of the next node: the id of this can be "new_question" 
     #Note: Make sure that you prompt the user to change the name of the node, otherwise there will be a clash
     #Do not allow the user to add any nodes until they have changed the name of this one. Throw an error 
     node_to_add = dialogues["node_to_add"]
     graph.add_nodes_from([(node_to_add['id'], node_to_add)])
     graph.add_edges_from([(current_node['id'], node_to_add['id'])])
-    current_node["NextDialogID"]=node_to_add['id']
+    
+    #if the Next ID array is empty with only '' in it, then we are appending the first child
+    if current_node['NextDialogID'][0]=='':
+        current_node['NextDialogID'][0] = node_to_add['id']
+    else:
+        current_node["NextDialogID"].append(node_to_add['id'])
     #print("updated_node", current_node)
+    print("Children array", current_node["NextDialogID"])
     graph.update_node_attrs(current_node['id'], current_node)
     #Check to see if the current node is empty - if no then proceed. 
-    """if(current_node!=None or current_node!=""):
-        out_edges = graph.out_edges(current_node['id']) #returns an array of edges in tuple format. 
-        print("out_edges", out_edges)
-         #Checking to see if the current node is not a filter node. 
-        if "filterType" not in graph.get_node(current_node['id']).keys():
-        
-            #Check to see if current node has any outgoing edges 
-            #in_edges = graph.in_edges(current_node)
-            #if no out edges are present, this means that the node is the last in the graph or dangling
-            if len(out_edges)==0:
-                #then just add the new node 
-                graph.add_nodes_from([("new_question", node_to_add)])
                 
-                #Add an edge from current to the new node 
-                graph.add_edges_from([(current_node, 'new_question')])
-
-            #if the node has 1 out going edge
-            elif len(out_edges)==1:
-                graph.add_nodes_from([("new_question", node_to_add)])
-                graph.remove_edge(current_node, out_edges[0][1])
-                graph.add_edges_from([(current_node, "new_question"), 
-                                    ("new_question", out_edges[0][1])])
-
-            #Add if current node has two outgoing edges - then it is a 
-            #yes or no type of question. Adding a new node to the yes and no dialogues. 
-            else: len(out_edges)==2:
-                graph.add_nodes_from([("new_question", node_to_add)])
-                graph.add_edges_from([(out_edges[0][1], "new_question"),
-                                    (out_edges[1][1], "new_question")])"""
-        #else: 
-        
-       ## graph.add_edges_from([(out_edges[0][1], "new_question"),
-                                    ##(out_edges[1][1], "new_question")])
-        ##@todo: allow to add many children
-                
-  
     return format_d3(graph.to_d3_json())
 
 def format_d3(data):
@@ -91,6 +64,7 @@ def format_d3(data):
     #print("nodes", nodes)
 
     formated_nodes = []
+    #@todo: make this more general
     for i in nodes:
         formated_data_sample = {"id":i['id']}
         #formated_data_sample= {'data': {'label': i['attrs']['DialogText']}}
@@ -108,6 +82,9 @@ def format_d3(data):
                     formated_data_sample[key]={d[0][0]: d[0][1]}
                 elif key.strip() =='alternates':
                     #print("Here alternates")
+                    formated_data_sample[key]=d
+                elif key.strip()=='NextDialogID':
+                    print(d)
                     formated_data_sample[key]=d
                 else:
                     
@@ -141,61 +118,6 @@ def format_d3(data):
     return new_data
 
 
-#Inserting yes or no type of questions to the current node 
-#this is when the user wants to convert the current question to a yes/no type.
-#so instead of next dialogue ID, the JSON can have next_positive and next_negative. 
-"""@app.route("/insert_yes_no", methods=["GET", "POST", "PUT"])
-def insert_yes_no():
-    global graph
-    #current node after which we want to add the dangling yes/no type of question
-    nodes= request.get_json()
-    current_node = nodes["current_node"] #Getting the current node from 
-    yes_dialogue = nodes["yes_dialogue"]
-    no_dialogue = nodes["no_dialogue"]
-   
-    current_node_attrs = graph.get_node_attrs(current_node)
-    out_edges = graph.out_edges(current_node)
-
-    #Check if it is not already a yes/no type node then proceed 
-    if  "filter" not in current_node_attrs.keys(): 
-
-        if len(out_edges)==0:
-            current_node_attrs["filterType"] = "SentimentFilter"
-            current_node_attrs["NextPositiveID"] = "yes_dialogue"
-            current_node_attrs["NextNegativeID"] = "no_dialogue"
-
-            graph.update_node_attrs(current_node, current_node_attrs)
-            graph.add_nodes_from([("yes_dialogue", yes_dialogue),
-                                ("no_dialogue", no_dialogue)])
-            graph.add_edges_from([(current_node, "yes_dialogue", {"type": "positive"}),
-                                (current_node, "no_dialogue", {"type": "negative"})])
-    
-        #Converting the current node in between nodes to a yes/no type of node
-        elif len(out_edges)==1:
-            #Getting the next node 
-            next_node = out_edges[0][1]
-
-            #removing this edge between the current node and the next node 
-            graph.remove_edge(current_node, next_node)
-
-            #Do the same this as above. 
-            current_node_attrs["filterType"] = "SentimentFilter"
-            current_node_attrs["NextPositiveID"] = "yes_dialogue"
-            current_node_attrs["NextNegativeID"] = "no_dialogue"
-
-            graph.update_node_attrs(current_node, current_node_attrs)
-            graph.add_nodes_from([("yes_dialogue", yes_dialogue),
-                                ("no_dialogue", no_dialogue)])
-
-            #This time add new edges from yes and no dialogues to the next node
-            graph.add_edges_from([(current_node, "yes_dialogue", {"type": "positive"}),
-                                (current_node, "no_dialogue", {"type": "negative"}),
-                                 ("yes_dialogue", next_node),
-                                 ("no_dialogue", next_node)])
-
-    return format_d3(graph.to_d3_json())
-"""
-
 @app.route("/relabel_node", methods=["GET", "POST", "PUT"])
 def relabel_node():
     global graph 
@@ -222,18 +144,25 @@ def create_edge():
     nodes = request.get_json()
     #Get the id of the source node 
     source_node = nodes["source_node"]
-    type = ''
-    if "filter" not in graph.get_node(source_node).keys():
-        if type=="positive" or type=="negative":
-            type= ""
-        else:
-            type = nodes["type"] #this can be empty
+    type = nodes["type"]
 
     target_node = nodes["target_node"]
+    if graph.exists_edge(source_node, target_node):
+        #return format_d3(graph.to_d3_json())
+        return "true"
+    else:    
+        graph.add_edges_from([(source_node, target_node, {"label": type})])
+        predecessor = graph.get_node(source_node)
+        predecessor["NextDialogID"] = list(predecessor["NextDialogID"])
+        if predecessor['NextDialogID'][0]=='':
+            predecessor['NextDialogID'][0] = target_node
+            graph.update_node_attrs(source_node, predecessor)
 
-    graph.add_edges_from([(source_node, target_node, {"label": type})])
+        else: 
+            predecessor["NextDialogID"].append(target_node)
+            graph.update_node_attrs(source_node, predecessor)
 
-    return format_d3(graph.to_d3_json())
+        return format_d3(graph.to_d3_json())
 
 
 #Update edge
@@ -247,12 +176,33 @@ def update_edge():
 
     return format_d3(graph.to_d3_json())
 
+#Checking if edge exists 
+@app.route("/exists_edge", methods=["PUT", "GET", 'POST'])
+def exists_edge():
+    global graph
+    message = request.get_json()
+    if graph.exists_edge(message['source'], message['target']):
+        return "true"
+    else:
+        return "false"
+        
+
 @app.route("/remove_edge", methods=["GET", "PUT", "POST"])
 def remove_edge():
 
     global graph 
     nodes = request.get_json()
-    graph.remove_edge(nodes["source_node"], nodes["target_node"])
+    source = nodes['source_node']
+    target = nodes['target_node']
+
+    graph.remove_edge(source, target)
+    predecessor = graph.get_node(source)
+    predecessor["NextDialogID"] = list(predecessor["NextDialogID"])
+    predecessor["NextDialogID"].remove(target)
+    if predecessor["NextDialogID"]==[]:
+        predecessor["NextDialogID"]=['']
+    graph.update_node_attrs(source, predecessor)
+
 
     return format_d3(graph.to_d3_json())
 
@@ -278,12 +228,35 @@ def exists_node():
 @app.route("/delete_node", methods=["GET", "POST", "PUT"])
 def delete_node():
     global graph
-    node_to_delete= request.get_json()["node_to_delete"] # this is just the id of the node
-    out_edges =graph.out_edges(node_to_delete)
-    in_edges = graph.in_edges(node_to_delete)
+    node_to_delete_id= request.get_json()["node_to_delete"] # this is just the id of the node
+    out_edges =graph.out_edges(node_to_delete_id)
+    print("out_edges", out_edges)
+    in_edges = graph.in_edges(node_to_delete_id)
+    print("in_edges", in_edges)
 
-    #If the node is the last one 
-    if (len(graph.out_edges(node_to_delete))==0):
+    graph.remove_node(node_to_delete_id)
+
+    for ie in in_edges:
+        print("In edge", ie)
+        source = ie[0]
+        predecessor = graph.get_node(source)
+        
+        print("predecessor", list(predecessor["NextDialogID"]))
+        #pos = list(predecessor['NextDialogID']).index(node_to_delete_id)
+        predecessor["NextDialogID"] = list(predecessor['NextDialogID'])
+        predecessor["NextDialogID"].remove(node_to_delete_id)
+        if predecessor["NextDialogID"]==[]:
+            predecessor["NextDialogID"]=['']
+        
+        print("Next children", predecessor['NextDialogID'])#predecessor["NextDialogID"].pop(pos)
+        graph.update_node_attrs(source, predecessor)
+    
+   
+
+    return format_d3(graph.to_d3_json())
+
+""" If the node is the last one 
+    if (len(out_edges)==0):
         #@todo: Check here to see if the node to delete has an 
         # in-edge with type positive or negative. If yes, then prompt that the node is 
         # a follow up to the previous question. 
@@ -291,7 +264,7 @@ def delete_node():
         #print("Node to delete", node_to_delete)
         graph.remove_node(node_to_delete)
 
-    elif len(list(graph.in_edges(node_to_delete)))==1 and len(list(graph.out_edges(node_to_delete)))==1:
+    elif len(list(in_edges))==1 and len(list(out_edges))==1:
         #predecessor = list(graph.predecessors(node_to_delete))[0]
         predecessor = graph.in_edges(node_to_delete)[0][0]
         print(predecessor)
@@ -301,9 +274,7 @@ def delete_node():
         
         graph.remove_node(node_to_delete)
         graph.add_edge(predecessor, successor)
-
-    return format_d3(graph.to_d3_json())
-
+"""
 """@app.route("/check_fully_connected", methods = ["GET", "PUT", "POST"])
 def check_fully_connected():
 
