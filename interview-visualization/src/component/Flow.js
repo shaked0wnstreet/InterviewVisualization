@@ -173,6 +173,7 @@ const OverviewFlow = (props) => {
     event.preventDefault()
     console.log(" click current node", node.id);
     currentSelectedNode = node;
+    currentSelectedEdge={}
 
 
     //setAnchorEl(event.currentTarget);
@@ -356,6 +357,17 @@ const OverviewFlow = (props) => {
 
   function createNewNodeObj(currentNode) {
     console.log("currentNode", currentNode)
+    let number_of_children = currentNode['NextDialogID'].length
+    let position = {'x': currentNode['position']['x'],
+                    'y': currentNode['position']['y']}
+    if (currentNode['NextDialogID'][0]=='' && number_of_children==1){
+      position = {'x': currentNode['position']['x'],
+                  'y': currentNode['position']['y']+100}
+    }
+    else if (number_of_children>1){
+      position = {'x': currentNode['position']['x']+(100*number_of_children),
+                  'y': currentNode['position']['y']+100}
+    }
     let newNode = {
       "id": dialogID,
       'DialogText': dialogText,
@@ -363,8 +375,7 @@ const OverviewFlow = (props) => {
       "NextDialogID": nextID,
      // 'requireResponse': requiredResponse,
       'section': section,
-      'position': {'x': currentNode['position']['x'],
-                    'y': currentNode['position']['y']+100},
+      'position': position,
       'data': {label: dialogText}
      }
 
@@ -434,22 +445,29 @@ const OverviewFlow = (props) => {
   function onEdgeClick(event, edge){
     event.preventDefault()
     console.log("Current edge", edge)
+    currentSelectedNode={}
     currentSelectedEdge=edge
   }
 
   const deleteFunction = useCallback((event) => {
+
     if (event.key === "Delete") {
-      //Do whatever when esc is pressed
-      if(currentSelectedEdge!={}){
-        props.onEdgeDelete(currentSelectedEdge.source, currentSelectedEdge.target)
-        currentSelectedEdge={}
-      }
+
+       console.log("current selected node", currentSelectedNode)
       if (currentSelectedNode['id']=='000'){
+
         props.setErrorMessage("Cannot delete root node!")
         props.setOpenSnackBar(true);
       }
-      
+      //Do whatever when esc is pressed
+      if(currentSelectedEdge!={}){
+        //currentSelectedNode={}
+        props.onEdgeDelete(currentSelectedEdge.source, currentSelectedEdge.target)
+        currentSelectedEdge={}
+      }
+
       if (currentSelectedNode!={} && currentSelectedNode['id']!='000'){
+        //currentSelectedEdge={}
         props.onDelete(currentSelectedNode['id'])
         currentSelectedNode={}
       }
@@ -480,7 +498,7 @@ const OverviewFlow = (props) => {
       <Grid item xs={2} md={2}>
         <ArrowBackIcon/> Back
       </Grid>
-      <Grid item xs={8} md={8}>
+      <Grid item xs={6} md={6}>
           <Button 
             fontSize="small"
             startIcon={<FileDownloadIcon/>}
@@ -488,11 +506,13 @@ const OverviewFlow = (props) => {
             Download 
           </Button>
       </Grid>
-      <Grid item xs={2} md={2}>
+      <Grid item xs={4} md={4}>
         <Tooltip fontSize="100" title="Right click on Nodes and Edges for options" >
               <HelpOutlineOutlinedIcon size="large"/>
 
-        </Tooltip>      
+        </Tooltip>  
+        Right click on Nodes and Edges for options
+    
         </Grid>
     </Grid>
     

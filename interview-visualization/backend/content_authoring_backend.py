@@ -229,6 +229,7 @@ def exists_node():
 def delete_node():
     global graph
     node_to_delete_id= request.get_json()["node_to_delete"] # this is just the id of the node
+    print("node to delete", node_to_delete_id)
     out_edges =graph.out_edges(node_to_delete_id)
     print("out_edges", out_edges)
     in_edges = graph.in_edges(node_to_delete_id)
