@@ -1,4 +1,4 @@
-import './App.css';
+//import './App.css';
 import PopUpForm  from './component/PopUpForm';
 import Button from '@mui/material/Button';
 import React, { useEffect, useState } from 'react';
@@ -18,7 +18,7 @@ import { LocalConvenienceStoreOutlined } from '@mui/icons-material';
 //import {InitGraph, InsertNode, RelabelNode, UpdateNode, UpdateGraph, DeleteNode} from './APIService';
 
 
-const  App=()=> {
+const  AuthoringTool=()=> {
   // const [onPopUp, setOnPopUp] = useState(false); 
   const [jsonArray, setJsonArray, { undo, redo }] = useUndoable({'nodes': [], 'links': []})
 

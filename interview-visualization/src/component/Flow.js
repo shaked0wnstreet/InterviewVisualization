@@ -9,6 +9,7 @@ import ReactFlow, {
   updateEdge,
   applyEdgeChanges,
   applyNodeChanges,
+  ControlButton,
   ReactFlowProvider,
   MarkerType
 } from "reactflow";
@@ -22,6 +23,11 @@ import BasicModal from "./Modal";
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import Tooltip from '@mui/material/Tooltip';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+
+import {IconButton, Snackbar, Alert} from '@mui/material';
+import RedoIcon from '@mui/icons-material/Redo';
+import UndoIcon from '@mui/icons-material/Undo';
+import CloseIcon from '@mui/icons-material/Close';
 
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 
@@ -364,7 +370,7 @@ const OverviewFlow = (props) => {
       position = {'x': currentNode['position']['x'],
                   'y': currentNode['position']['y']+100}
     }
-    else if (number_of_children>1){
+    else if (number_of_children>=1){
       position = {'x': currentNode['position']['x']+(100*number_of_children),
                   'y': currentNode['position']['y']+100}
     }
@@ -421,6 +427,9 @@ const OverviewFlow = (props) => {
   const [tooltipAnchorEl, setTooltipAnchorEl] = React.useState(null);
   const tooltipOpen = Boolean(tooltipAnchorEl)
  
+  //const [editTextFieldAnchorEl, setEditTextFieldAnchorEl] = React.useState(null);
+  const [editLabel, setEditLabel] = useState(false)
+ 
   function onEdgeContextMenu(event, edge){
     event.preventDefault() 
     currentSelectedEdge = edge;
@@ -449,11 +458,14 @@ const OverviewFlow = (props) => {
     currentSelectedEdge=edge
   }
 
+  /************************KEY CONTROLS************************************************ */
+  
+  //DELETE CONTROLS
   const deleteFunction = useCallback((event) => {
 
     if (event.key === "Delete") {
 
-       console.log("current selected node", currentSelectedNode)
+       console.log("key", event)
       if (currentSelectedNode['id']=='000'){
 
         props.setErrorMessage("Cannot delete root node!")
@@ -482,9 +494,62 @@ const OverviewFlow = (props) => {
     };
   }, [deleteFunction]);
 
-  //const [editTextFieldAnchorEl, setEditTextFieldAnchorEl] = React.useState(null);
-  const [editLabel, setEditLabel] = useState(false)
- 
+
+  //UNDO Ctrl+Z
+  const undoRedoFunction = useCallback((event) => {
+
+    if (event.ctrlKey==true &&  event.key== "z") {
+
+      console.log("UNDO", event)
+        props.undo()
+
+    }
+    /*else if (event.ctrlKey==true &&  event.key== "y") {
+
+      console.log("REDO", event)
+      props.redo()
+
+    }      
+    */
+  
+  }, []);
+
+    
+  //REDO Ctrl+Y
+ /* const redoFunction = useCallback((event) => {
+
+    if (event.ctrlKey==true &&  event.key== "y") {
+
+      console.log("REDO", event)
+      props.redo()
+
+    }
+  }, []);*/
+
+  useEffect(() => {
+    document.addEventListener("keydown", undoRedoFunction, false);
+    //document.addEventListener("keydown", redoFunction, false);
+
+
+    return () => {
+      document.removeEventListener("keydown", undoRedoFunction, false);
+     // document.removeEventListener("keydown", redoFunction, false);
+
+    };
+  }, [undoRedoFunction]);
+
+
+
+  /*useEffect(() => {
+    document.addEventListener("keydown", redoFunction, false);
+
+    return () => {
+      document.removeEventListener("keydown", redoFunction, false);
+    };
+  }, [redoFunction]);
+  */
+  
+  
 
 
   //***********************************RENDERING*******************************************/
@@ -496,27 +561,58 @@ const OverviewFlow = (props) => {
     alignItems={"center"}>
       
       <Grid item xs={2} md={2}>
-        <ArrowBackIcon/> Back
+      <Button 
+              fontSize="small"
+              size="small"
+              startIcon={<ArrowBackIcon/>}
+              //onClick={}
+              > 
+              Back
+          </Button>
       </Grid>
-      <Grid item xs={6} md={6}>
+      <Grid item xs={4} md={4}>
           <Button 
+            size="small"
+              fontSize="small"
+              disabled={nodes.length==1? true: false}
+              startIcon={<UndoIcon/>}
+              onClick={props.undo}> 
+              Undo
+          </Button>
+          <Button 
+              size='small'
+              fontSize="small"
+              startIcon={<RedoIcon/>}
+              onClick={props.redo}> 
+              Redo
+          </Button>
+        
+      </Grid>
+      <Grid item xs={3} md={3}>
+         <Button 
+            size="small"
             fontSize="small"
             startIcon={<FileDownloadIcon/>}
             onClick={downloadTxtFile}> 
             Download 
           </Button>
+          
       </Grid>
-      <Grid item xs={4} md={4}>
-        <Tooltip fontSize="100" title="Right click on Nodes and Edges for options" >
-              <HelpOutlineOutlinedIcon size="large"/>
+      <Grid item xs={3} md={3} style={{alignItems: "center", fontSize: "12px"}}>
+       {/* <Tooltip aria-setsize={"small"} title="Right click on Nodes and Edges for options" >*/}
 
-        </Tooltip>  
-        Right click on Nodes and Edges for options
+
+        {/*</Tooltip> */} 
+        <HelpOutlineOutlinedIcon fontSize="8" 
+        size="small"
+        alignItems={"center"}/> Right click on nodes and edges for options.
+ 
     
         </Grid>
     </Grid>
-    
- 
+
+   
+
 
       {/*<div>{JSON.stringify(currentSelectedNode['position'])}</div>*/}
       <ReactFlow
@@ -684,6 +780,18 @@ const OverviewFlow = (props) => {
               </Button>
           </div>
         </Popover>
+        <Controls position="top-left">
+            <ControlButton onClick={props.undo}>
+            <Tooltip title="Undo">
+              <UndoIcon/>
+            </Tooltip>
+            </ControlButton>
+            <ControlButton onClick={props.redo}>
+              <Tooltip title="Redo">
+                <RedoIcon/>
+              </Tooltip>
+            </ControlButton>
+          </Controls>
 
         <MiniMap
           nodeStrokeColor={(n) => {
@@ -701,8 +809,9 @@ const OverviewFlow = (props) => {
           }}
           nodeBorderRadius={2}
         /> 
-        <Controls />
+         
         <Background color="#aaa" gap={16} />
+        
       </ReactFlow >
        {isModalOpen ? /*<div><PopUpForm2/></div>: "No"*/
         <div className="pop-up-form">
