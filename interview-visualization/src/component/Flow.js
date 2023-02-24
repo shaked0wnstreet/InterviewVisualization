@@ -182,12 +182,15 @@ const OverviewFlow = (props) => {
   const [onAdd, setOnAdd] = useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
 
-  /*const onDblClick = (event, node) => {
+  const onDblClick = (event, node) => {
     console.log("double click current node", node.id);
-    currentSelectedNode = node;
-   
-    setAnchorEl(event.currentTarget);
-  };*/
+    event.preventDefault()
+    currentSelectedNode=node;
+    //console.log(event, node)
+    //setOpen(true)
+    setTooltipAnchorEl(null);
+    setAnchorEl(event.currentTarget)
+  };
 
   const onNodeClick = (event, node) => {
     event.preventDefault()
@@ -642,6 +645,8 @@ const OverviewFlow = (props) => {
         onEdgeContextMenu={onEdgeContextMenu}
         onEdgeClick={onEdgeClick}
         onNodeDragStop={onNodeDragStop}
+        onNodeDoubleClick={onDblClick}
+
         //onNodeMouseEnter={onNodeMouseEnter}
         //onNodeMouseLeave={onNodeMouseLeave}
         //onConnectEnd= {onConnectEnd}

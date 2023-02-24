@@ -5,6 +5,7 @@ import React, { useEffect } from "react";
 import Box from '@mui/material/Box';
 import {Alert, AlertTitle} from '@mui/material';
 //import Alternate  from './Alternate';
+import RemoveIcon from '@mui/icons-material/Remove';
 
 
 function PopUpForm(props) { 
@@ -160,7 +161,7 @@ function PopUpForm(props) {
                   fullWidth
                   placeholder="What do you think was challenging about the job?"
                 />
-                <button type="button" onClick={() => removeAlternateFields(index)}>-</button>
+                <Button color='primary' startIcon={<RemoveIcon/>} onClick={() => removeAlternateFields(index)}></Button>
               </Stack>
         ))}
 
