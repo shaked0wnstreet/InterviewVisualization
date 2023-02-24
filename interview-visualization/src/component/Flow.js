@@ -38,6 +38,9 @@ import TextUpdaterNode from './TextUpdaterNode.js';
 import './text-updater-node.css';
 import './reactflow.css';
 
+import { useNavigate } from 'react-router-dom';
+
+
 
 
 let newNodes = {
@@ -57,6 +60,15 @@ let currentSelectedEdge = {}
 
 
 const OverviewFlow = (props) => {
+
+
+  const navigate = useNavigate();
+
+
+    function navigateHome(){
+
+        navigate(-1)
+    }
 
   
   const [nodes, setNodes] = useNodesState(props.jsonArray["nodes"]);
@@ -112,6 +124,7 @@ const OverviewFlow = (props) => {
           console.log("selected: "+ changes[0]['id'])
         }
    // setxyPos(false)
+     
      return applyNodeChanges(changes, nds)
     }),
     [setNodes]
@@ -565,7 +578,7 @@ const OverviewFlow = (props) => {
               fontSize="small"
               size="small"
               startIcon={<ArrowBackIcon/>}
-              //onClick={}
+              onClick={navigateHome}
               > 
               Back
           </Button>
@@ -781,7 +794,9 @@ const OverviewFlow = (props) => {
           </div>
         </Popover>
         <Controls position="top-left">
-            <ControlButton onClick={props.undo}>
+            <ControlButton onClick={props.undo}               
+            disabled={nodes.length==1? true: false}
+>
             <Tooltip title="Undo">
               <UndoIcon/>
             </Tooltip>
@@ -876,7 +891,7 @@ const OverviewFlow = (props) => {
         }
       }}
       onChange={(event)=>{
-        console.log("edge condition", event.target.value)
+       // console.log("edge condition", event.target.value)
         currentSelectedEdge['type'] = event.target.value
         currentSelectedEdge['label'] = event.target.value;
         

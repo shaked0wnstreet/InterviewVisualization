@@ -21,6 +21,19 @@ def init():
     print(format_d3(graph.to_d3_json()))
     return format_d3(graph.to_d3_json())
 
+#Initializing graph from template
+@app.route("/init_graph", methods=['GET', 'POST', 'PUT'])
+def init_graph():
+    global graph
+    graph=NXGraph()
+
+    init_graph = request.get_json()['init_graph']
+
+    print("graph", init_graph['links'])
+    graph.add_nodes_from([(node['id'], node) for node in init_graph['nodes']])    #graph.add_edges_from(init_graph['links'])
+    graph.add_edges_from([(edge['source'], edge['target'], edge) for edge in init_graph['links']])
+    return format_d3(graph.to_d3_json())
+
 #When the last node is dangling, then you go on to add a node at the end of the graph
 @app.route("/insert_node", methods=["GET", "POST", "PUT"])
 def insert_node():

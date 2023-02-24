@@ -13,14 +13,22 @@ import {IconButton, Snackbar, Alert, Grid} from '@mui/material';
 import RedoIcon from '@mui/icons-material/Redo';
 import UndoIcon from '@mui/icons-material/Undo';
 import CloseIcon from '@mui/icons-material/Close';
-import { LocalConvenienceStoreOutlined } from '@mui/icons-material';
+import data from "./DataStorage/graph.json"
+import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+
 
 //import {InitGraph, InsertNode, RelabelNode, UpdateNode, UpdateGraph, DeleteNode} from './APIService';
 
 
-const  AuthoringTool=()=> {
+const  AuthoringTool=(props)=> {
+
+    const location = useLocation();
+
+
+    
   // const [onPopUp, setOnPopUp] = useState(false); 
-  const [jsonArray, setJsonArray, { undo, redo }] = useUndoable({'nodes': [], 'links': []})
+  const [jsonArray, setJsonArray, { undo, redo }] = useUndoable(location.state=='from-template'?data: {'nodes': [], 'links': []})
 
   //const [jsonArray, setJsonArray] = useState({'nodes': [], 'links': []})
   const [interviewerDialogs, setInterviewerDialogs] = useState('');
@@ -29,37 +37,63 @@ const  AuthoringTool=()=> {
 
   useEffect(() => {
 
-    let init_node = {
-      id: "000",
-      DialogText: "Hello, nice to meet you?",
-      alternates: ['Hi there', "Hello, my name is..."],
-      data: {label: "Hello, nice to meet you?"},
-      NextDialogID: [""],
-      position: {x: 200, y: -100},
-      type: 'input',
-      section: "Greetings"
+    if(location.state!="from-template"){
+
+        let init_node = {
+        id: "000",
+        DialogText: "Hello, nice to meet you?",
+        alternates: ['Hi there', "Hello, my name is..."],
+        data: {label: "Hello, nice to meet you?"},
+        NextDialogID: [""],
+        position: {x: 200, y: -100},
+        type: 'input',
+        section: "Greetings"
+        }
+    
+    // console.log("init_node", init_node)
+        fetch('http://localhost:5000/init', {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json', 
+        'Access-Control-Allow-Origin': true,
+        'Access-Control-Allow-Methods': 'GET, POST, PUT'},
+        body: JSON.stringify({"init_node": init_node}),
+        })
+        .then((response) => response.json())
+        .then((data) => {
+    
+        setJsonArray(data)
+        setInterviewerDialogs(data['nodes'])
+        })
+        .catch(error => console.log(error));
     }
-   
-   // console.log("init_node", init_node)
-    fetch('http://localhost:5000/init', {
-    method: 'PUT',
-    headers: {'Content-Type': 'application/json', 
-      'Access-Control-Allow-Origin': true,
-      'Access-Control-Allow-Methods': 'GET, POST, PUT'},
-    body: JSON.stringify({"init_node": init_node}),
-    })
-    .then((response) => response.json())
-    .then((data) => {
-   
-      setJsonArray(data)
-      setInterviewerDialogs(data['nodes'])
-    })
-    .catch(error => console.log(error));
+    else{
+        fetch('http://localhost:5000/init_graph', {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json', 
+            'Access-Control-Allow-Origin': true,
+            'Access-Control-Allow-Methods': 'GET, POST, PUT'},
+            body: JSON.stringify({"init_graph": jsonArray}),
+            })
+            .then((response) => response.json())
+            .then((data) => {
+        
+            setJsonArray(data)
+            setInterviewerDialogs(data['nodes'])
+            })
+            .catch(error => console.log(error));
+
+    }
 
   
 
     
-  }, []);
+  }, [])
+
+  useEffect(()=>{
+    localStorage.setItem
+
+  }, [jsonArray]
+  )
   
 
   function onAddSubmit(currNode, newNode) {
@@ -254,4 +288,4 @@ const  AuthoringTool=()=> {
     </div>
   );
 }
-export default App;
+export default AuthoringTool;
