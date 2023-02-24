@@ -1,5 +1,5 @@
 import './PopUp.css';
-import { MenuItem, Stack, TextField, Divider, Button, Checkbox, FormControlLabel } from '@mui/material';
+import { MenuItem, Menu, Stack, TextField, Divider, Button, Checkbox, FormControlLabel, MenuList } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import React, { useEffect } from "react";
 import Box from '@mui/material/Box';
@@ -127,13 +127,16 @@ function PopUpForm(props) {
           onChange={(e) => props.onSectionChange(e)}
           helperText="Please select the interview section"
           >
-          {sections.map((option) => (
+             {sections.map((option) => (
             <MenuItem key={option.value} value={option.value}>
-              {option.value}
+              <p>{option.value}</p>
             </MenuItem>
           ))}
-          </TextField>
           
+      
+          </TextField>
+              
+         
         </Stack>
         <TextField
           id="filled-multiline-static"

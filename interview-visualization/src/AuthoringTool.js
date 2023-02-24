@@ -263,6 +263,7 @@ const  AuthoringTool=(props)=> {
 
       {/*JSON.stringify(jsonArray['nodes'])*/}
       {/*JSON.stringify(jsonArray['links'])*/}
+      {console.log(jsonArray['nodes'])}
       <main style={{ height: window.innerHeight-50}}>
       
 

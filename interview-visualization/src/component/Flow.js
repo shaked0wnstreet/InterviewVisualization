@@ -36,7 +36,7 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import TextUpdaterNode from './TextUpdaterNode.js';
 
 import './text-updater-node.css';
-import './reactflow.css';
+//import './reactflow.css';
 
 import { useNavigate } from 'react-router-dom';
 
@@ -482,7 +482,7 @@ const OverviewFlow = (props) => {
 
     if (event.key === "Delete") {
 
-       console.log("key", event)
+       //console.log("key", event)
       if (currentSelectedNode['id']=='000'){
 
         props.setErrorMessage("Cannot delete root node!")
@@ -515,10 +515,13 @@ const OverviewFlow = (props) => {
   //UNDO Ctrl+Z
   const undoRedoFunction = useCallback((event) => {
 
-    if (event.ctrlKey==true &&  event.key== "z") {
+    //console.log(event)
+    if (event.code== "KeyZ") {
 
       console.log("UNDO", event)
-        props.undo()
+      props.undo
+
+     
 
     }
     /*else if (event.ctrlKey==true &&  event.key== "y") {
@@ -593,7 +596,24 @@ const OverviewFlow = (props) => {
               fontSize="small"
               disabled={nodes.length==1? true: false}
               startIcon={<UndoIcon/>}
-              onClick={props.undo}> 
+              onClick=
+              { props.undo
+               /* fetch('http://localhost:5000/init_graph', {
+                  method: 'PUT',
+                  headers: {'Content-Type': 'application/json', 
+                  'Access-Control-Allow-Origin': true,
+                  'Access-Control-Allow-Methods': 'GET, POST, PUT'},
+                  body: JSON.stringify({"init_graph": props.jsonArray}),
+                  })
+                  .then((response) => response.json())
+                  .then((data) => {
+              
+                  props.setJsonArray(data)
+                  })
+                  .catch(error => console.log(error));
+                  */
+          
+              }> 
               Undo
           </Button>
           <Button 
