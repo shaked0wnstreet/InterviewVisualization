@@ -80,7 +80,9 @@ function PopUpForm(props) {
             label="Dialog ID"
             value={props.dialogID}
             disabled={props.onEdit}
+            autoComplete="off"
             onChange={(e) => {
+              e.preventDefault()
               console.log(e.target.value)
               
               

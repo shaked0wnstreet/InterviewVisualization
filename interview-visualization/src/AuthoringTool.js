@@ -43,7 +43,7 @@ const  AuthoringTool=(props)=> {
         id: "000",
         DialogText: "Hello, nice to meet you?",
         alternates: ['Hi there', "Hello, my name is..."],
-        data: {label: "Hello, nice to meet you?"},
+        data: {label: "000 Hello, nice to meet you?"},
         NextDialogID: [""],
         position: {x: 200, y: -100},
         type: 'input',

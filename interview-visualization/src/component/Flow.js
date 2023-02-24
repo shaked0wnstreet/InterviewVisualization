@@ -66,8 +66,9 @@ const OverviewFlow = (props) => {
 
 
     function navigateHome(){
-
         navigate(-1)
+        props.setJsonArray({'links':[], 'nodes': []})
+
     }
 
   
@@ -149,7 +150,7 @@ const OverviewFlow = (props) => {
 
   const onDialogTextChange = (e) => {
     setDialogText(e.target.value);
-    setLabel({label:e.target.value})
+    setLabel({label: currentSelectedNode['id']+ " "+ e.target.value})
   }
 
   const [dialogID, setDialogID] = useState('')
@@ -367,7 +368,7 @@ const OverviewFlow = (props) => {
       'section': section,
       'position': {'x': currentNode['position']['x'],
                     'y': currentNode['position']['y']},
-      'data': {label: dialogText},
+      'data': {label: dialogID + " "+ dialogText},
       'type': dialogID=='000'? 'input': 'default'
      }
 
@@ -395,7 +396,7 @@ const OverviewFlow = (props) => {
      // 'requireResponse': requiredResponse,
       'section': section,
       'position': position,
-      'data': {label: dialogText}
+      'data': {label: dialogID+ " "+ dialogText}
      }
 
     return newNode;
