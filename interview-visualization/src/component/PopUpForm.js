@@ -78,7 +78,7 @@ function PopUpForm(props) {
           <TextField
             required
             id="outlined-required"
-            label="Dialog ID"
+            label="Dialogue ID"
             value={props.dialogID}
             disabled={props.onEdit}
             autoComplete="off"
@@ -140,7 +140,7 @@ function PopUpForm(props) {
         </Stack>
         <TextField
           id="filled-multiline-static"
-          label="Dialog Text"
+          label="Dialogue Text"
           value ={props.dialogText}
           multiline
           rows={2}
@@ -155,7 +155,7 @@ function PopUpForm(props) {
                 <TextField
                   key={index}
                   id="filled-multiline-static"
-                  label="Alternate Dialog"
+                  label="Alternate Dialogue"
                   name="alternate"
                   defaultValue={element === null ? '' : element} 
                   onChange={(e) => handleAlternateChange(index, e)}
